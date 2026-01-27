@@ -24,7 +24,12 @@ serve(async (req) => {
 
     const { action, clientId, email, invoiceId } = await req.json();
 
-    const baseUrl = `https://${FAKTUROWNIA_DOMAIN}.fakturownia.pl`;
+    // Clean domain - remove https:// or http:// prefix if present, and handle .fakturownia.pl suffix
+    let domain = FAKTUROWNIA_DOMAIN.replace(/^https?:\/\//, '');
+    if (!domain.includes('.fakturownia.pl')) {
+      domain = `${domain}.fakturownia.pl`;
+    }
+    const baseUrl = `https://${domain}`;
     const headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
