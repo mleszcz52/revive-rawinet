@@ -60,6 +60,7 @@ serve(async (req) => {
       domain = `${domain}.fakturownia.pl`;
     }
     const baseUrl = `https://${domain}`;
+    const apiTokenParam = encodeURIComponent(FAKTUROWNIA_API_TOKEN);
     
     console.log(`Fakturownia request: action=${action}, baseUrl=${baseUrl}`);
     
@@ -75,55 +76,56 @@ serve(async (req) => {
     switch (action) {
       case 'getClientByEmail':
         // Search for client by email
-        url = `${baseUrl}/clients.json?api_token=${FAKTUROWNIA_API_TOKEN}&email=${encodeURIComponent(email)}`;
+        url = `${baseUrl}/clients.json?api_token=${apiTokenParam}&email=${encodeURIComponent(email)}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       case 'getClient':
         // Get client details by ID
-        url = `${baseUrl}/clients/${clientId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        url = `${baseUrl}/clients/${clientId}.json?api_token=${apiTokenParam}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       case 'getClientInvoices':
         // Get all invoices for a client
-        url = `${baseUrl}/invoices.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`;
+        url = `${baseUrl}/invoices.json?api_token=${apiTokenParam}&client_id=${clientId}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       case 'getInvoice':
         // Get single invoice details
-        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${apiTokenParam}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       case 'getInvoicePdf':
         // Get invoice PDF URL
-        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${apiTokenParam}`;
         response = await fetch(url, { headers });
-        const invoice = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        const invoice = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         data = {
-          pdfUrl: `${baseUrl}/invoices/${invoiceId}.pdf?api_token=${FAKTUROWNIA_API_TOKEN}`,
+          pdfUrl: `${baseUrl}/invoices/${invoiceId}.pdf?api_token=${apiTokenParam}`,
           invoice
         };
         break;
 
       case 'getClientPayments':
         // Get payments for client
-        url = `${baseUrl}/payments.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`;
+        // NOTE: Fakturownia exposes payments under /banking/payments
+        url = `${baseUrl}/banking/payments.json?api_token=${apiTokenParam}&client_id=${clientId}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       case 'getProducts':
         // Get all products/services
-        url = `${baseUrl}/products.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        url = `${baseUrl}/products.json?api_token=${apiTokenParam}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
+        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
         break;
 
       default:
