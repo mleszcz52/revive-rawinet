@@ -27,7 +27,7 @@ export const Header = () => {
             <img 
               src={logoRawinet} 
               alt="Rawinet - Internet Telewizja" 
-              className="h-10 lg:h-12 w-auto transition-transform group-hover:scale-105"
+              className="h-14 lg:h-16 w-auto transition-transform group-hover:scale-105"
             />
           </Link>
 
