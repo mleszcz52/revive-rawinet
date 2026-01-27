@@ -1,74 +1,37 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Check, Building2, Shield, Clock, Headphones } from "lucide-react";
+import { Check, Building2, Shield, Clock, Headphones, Zap, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-const businessPlans = [
-  {
-    name: "Biznes Start",
-    speed: "300 Mbps",
-    price: "99",
-    features: [
-      "Symetryczne 300/300 Mbps",
-      "Stały adres IP",
-      "SLA 99%",
-      "Wsparcie w godzinach pracy",
-      "Router biznesowy",
-    ],
-    popular: false,
-  },
-  {
-    name: "Biznes Pro",
-    speed: "1 Gbps",
-    price: "199",
-    features: [
-      "Symetryczne 1/1 Gbps",
-      "Stały adres IP",
-      "SLA 99.5%",
-      "Wsparcie 24/7",
-      "Router enterprise",
-      "Priorytetowa obsługa",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    speed: "10 Gbps",
-    price: "Indywidualnie",
-    features: [
-      "Do 10 Gbps symetrycznie",
-      "Pula adresów IP",
-      "SLA 99.9%",
-      "Dedykowany opiekun",
-      "Redundancja łącza",
-      "Rozwiązania VPN",
-    ],
-    popular: false,
-  },
-];
 
 const businessFeatures = [
   {
-    icon: Building2,
-    title: "Dla firm każdej wielkości",
-    description: "Od małych firm po duże przedsiębiorstwa - mamy rozwiązanie dla Ciebie.",
+    icon: Shield,
+    title: "Gwarancja parametrów",
+    description: "Gwarancja zachowania określonych parametrów pasma i braku overbookingu.",
   },
   {
-    icon: Shield,
-    title: "Gwarancja SLA",
-    description: "Gwarantowana dostępność usługi z jasno określonymi warunkami.",
+    icon: Zap,
+    title: "Pasmo symetryczne",
+    description: "Prędkość transmisji w obydwu kierunkach jest identyczna i gwarantowana.",
   },
   {
     icon: Clock,
-    title: "Szybka reakcja",
-    description: "Krótki czas reakcji na zgłoszenia i priorytetowa obsługa.",
+    title: "Elastyczność",
+    description: "Szybkość transmisji dostosowywana do potrzeb Klientów, od 1 Mb/s.",
   },
   {
     icon: Headphones,
-    title: "Dedykowane wsparcie",
-    description: "Dedykowany opiekun klienta i wsparcie techniczne 24/7.",
+    title: "Serwis 24/7/365",
+    description: "Profesjonalny serwis dostępny przez całą dobę, cały rok.",
   },
+];
+
+const useCases = [
+  "Dostawcy usług Internetowych (ISP)",
+  "Firmy wymagające stabilnych i szybkich łączy internetowych",
+  "Przedsiębiorstwa z wieloma lokalizacjami",
+  "Firmy korzystające z usług chmurowych",
+  "Organizacje wymagające wysokiej dostępności",
 ];
 
 const Business = () => {
@@ -87,11 +50,23 @@ const Business = () => {
                 Rozwiązania <span className="text-gradient">dla firm</span>
               </h1>
               <p className="text-lg text-white/70 mb-8">
-                Profesjonalne łącza światłowodowe z gwarancją SLA dla Twojego biznesu.
+                Wysokiej jakości dostęp do krajowych i zagranicznych zasobów sieci Internet. 
+                Oferujemy szeroki zakres przepustowości, pozwalający na dostosowanie rozwiązań do bieżącego zapotrzebowania Klienta.
               </p>
-              <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                Zapytaj o ofertę
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="tel:505051376">
+                  <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                    <Phone className="w-5 h-5 mr-2" />
+                    505 051 376
+                  </Button>
+                </a>
+                <a href="tel:605934593">
+                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                    <Phone className="w-5 h-5 mr-2" />
+                    605 934 593
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -99,6 +74,11 @@ const Business = () => {
         {/* Features */}
         <section className="py-16 lg:py-24 bg-muted/30">
           <div className="container mx-auto px-4 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                Korzyści dla <span className="text-gradient">Klienta</span>
+              </h2>
+            </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {businessFeatures.map((feature) => (
                 <div key={feature.title} className="text-center">
@@ -113,78 +93,105 @@ const Business = () => {
           </div>
         </section>
 
-        {/* Business Plans */}
+        {/* Service Details */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                Pakiety <span className="text-gradient">biznesowe</span>
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Wybierz pakiet dopasowany do potrzeb Twojej firmy.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {businessPlans.map((plan) => (
-                <div
-                  key={plan.name}
-                  className={cn(
-                    "relative bg-card rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-card-hover",
-                    plan.popular
-                      ? "border-primary shadow-glow lg:scale-105"
-                      : "border-border shadow-card"
-                  )}
-                >
-                  {plan.popular && (
-                    <div className="absolute top-0 left-0 right-0 gradient-primary py-2 text-center">
-                      <span className="text-sm font-semibold text-primary-foreground">
-                        ⭐ Polecany
-                      </span>
+            <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                  Usługa <span className="text-gradient">internetowa</span>
+                </h2>
+                <p className="text-lg text-muted-foreground mb-6">
+                  Usługa internetowa to wysokiej jakości dostęp do krajowych i zagranicznych zasobów sieci Internet. 
+                  Oferujemy szeroki zakres przepustowości, pozwalający na dostosowanie rozwiązań do bieżącego zapotrzebowania 
+                  Klienta oraz ich modyfikację w miarę rozwoju firmy.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                      <Check className="w-3 h-3 text-green-500" />
                     </div>
-                  )}
-
-                  <div className={cn("p-8", plan.popular && "pt-14")}>
-                    <div className="text-center mb-6">
-                      <h3 className="text-xl font-bold text-foreground mb-2">{plan.name}</h3>
-                      <p className="text-3xl font-bold text-primary mb-1">{plan.speed}</p>
+                    <span className="text-muted-foreground">Gwarancja zachowania określonych parametrów pasma i braku overbookingu</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                      <Check className="w-3 h-3 text-green-500" />
                     </div>
-
-                    <div className="text-center mb-8">
-                      {plan.price === "Indywidualnie" ? (
-                        <span className="text-2xl font-bold text-foreground">{plan.price}</span>
-                      ) : (
-                        <>
-                          <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                          <span className="text-muted-foreground"> zł netto/mies.</span>
-                        </>
-                      )}
+                    <span className="text-muted-foreground">Łącze dostępowe zakończone stykiem Ethernet</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                      <Check className="w-3 h-3 text-green-500" />
                     </div>
+                    <span className="text-muted-foreground">Szybkość transmisji dostosowywana do potrzeb - od 1 Mb/s</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                      <Check className="w-3 h-3 text-green-500" />
+                    </div>
+                    <span className="text-muted-foreground">Pasmo symetryczne - identyczna i gwarantowana prędkość w obu kierunkach</span>
+                  </li>
+                </ul>
+              </div>
 
-                    <ul className="space-y-3 mb-8">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-green-500" />
-                          </div>
-                          <span className="text-muted-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Button
-                      className={cn(
-                        "w-full font-semibold",
-                        plan.popular
-                          ? "gradient-primary text-primary-foreground shadow-glow"
-                          : "bg-secondary text-secondary-foreground"
-                      )}
-                    >
-                      {plan.price === "Indywidualnie" ? "Zapytaj o ofertę" : "Zamów teraz"}
-                    </Button>
+              <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                    <Building2 className="w-6 h-6 text-primary-foreground" />
                   </div>
+                  <h3 className="text-xl font-bold text-foreground">Zastosowanie</h3>
                 </div>
-              ))}
+                <p className="text-muted-foreground mb-6">
+                  To optymalne rozwiązanie dla:
+                </p>
+                <ul className="space-y-3">
+                  {useCases.map((useCase, index) => (
+                    <li key={index} className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-primary" />
+                      </div>
+                      <span className="text-foreground">{useCase}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Us */}
+        <section className="py-16 lg:py-24 bg-muted/30">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+                Dlaczego <span className="text-gradient">Rawi-Net?</span>
+              </h2>
+              <div className="grid md:grid-cols-3 gap-8 mb-12">
+                <div className="bg-card rounded-xl p-6 border border-border">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Bezpieczeństwo</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Rawi-Net świadczy usługi najwyższej jakości
+                  </p>
+                </div>
+                <div className="bg-card rounded-xl p-6 border border-border">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Profesjonalizm</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Serwis dostępny w systemie 24/7/365
+                  </p>
+                </div>
+                <div className="bg-card rounded-xl p-6 border border-border">
+                  <h3 className="text-lg font-bold text-foreground mb-2">Optymalne rozwiązanie</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Ofertę tworzymy indywidualnie dla Klienta
+                  </p>
+                </div>
+              </div>
+              <a href="tel:505051376">
+                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  <Phone className="w-5 h-5 mr-2" />
+                  Zapytaj o ofertę
+                </Button>
+              </a>
             </div>
           </div>
         </section>
