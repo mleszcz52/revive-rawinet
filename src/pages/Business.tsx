@@ -61,7 +61,7 @@ const Business = () => {
                   </Button>
                 </a>
                 <a href="tel:605934593">
-                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                  <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
                     <Phone className="w-5 h-5 mr-2" />
                     605 934 593
                   </Button>
