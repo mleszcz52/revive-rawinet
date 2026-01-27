@@ -6,6 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
+// Helper function to safely parse JSON response
+async function safeJsonParse(response: Response, url: string) {
+  const text = await response.text();
+  
+  if (!response.ok) {
+    console.error(`Fakturownia API error: ${response.status} ${response.statusText}`);
+    console.error(`URL: ${url}`);
+    console.error(`Response: ${text.substring(0, 500)}`);
+    throw new Error(`Fakturownia API error: ${response.status} ${response.statusText}`);
+  }
+  
+  // Check if response is HTML (error page)
+  if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+    console.error(`Fakturownia returned HTML instead of JSON`);
+    console.error(`URL: ${url}`);
+    console.error(`Response: ${text.substring(0, 500)}`);
+    throw new Error('Fakturownia API returned an error page. Please check credentials.');
+  }
+  
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error(`Failed to parse JSON from Fakturownia`);
+    console.error(`URL: ${url}`);
+    console.error(`Response: ${text.substring(0, 500)}`);
+    throw new Error('Invalid JSON response from Fakturownia');
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -31,6 +60,9 @@ serve(async (req) => {
       domain = `${domain}.fakturownia.pl`;
     }
     const baseUrl = `https://${domain}`;
+    
+    console.log(`Fakturownia request: action=${action}, baseUrl=${baseUrl}`);
+    
     const headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -38,51 +70,42 @@ serve(async (req) => {
 
     let response;
     let data;
+    let url: string;
 
     switch (action) {
       case 'getClientByEmail':
         // Search for client by email
-        response = await fetch(
-          `${baseUrl}/clients.json?api_token=${FAKTUROWNIA_API_TOKEN}&email=${encodeURIComponent(email)}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/clients.json?api_token=${FAKTUROWNIA_API_TOKEN}&email=${encodeURIComponent(email)}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       case 'getClient':
         // Get client details by ID
-        response = await fetch(
-          `${baseUrl}/clients/${clientId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/clients/${clientId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       case 'getClientInvoices':
         // Get all invoices for a client
-        response = await fetch(
-          `${baseUrl}/invoices.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/invoices.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       case 'getInvoice':
         // Get single invoice details
-        response = await fetch(
-          `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       case 'getInvoicePdf':
         // Get invoice PDF URL
-        response = await fetch(
-          `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`,
-          { headers }
-        );
-        const invoice = await response.json();
+        url = `${baseUrl}/invoices/${invoiceId}.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        response = await fetch(url, { headers });
+        const invoice = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         data = {
           pdfUrl: `${baseUrl}/invoices/${invoiceId}.pdf?api_token=${FAKTUROWNIA_API_TOKEN}`,
           invoice
@@ -91,20 +114,16 @@ serve(async (req) => {
 
       case 'getClientPayments':
         // Get payments for client
-        response = await fetch(
-          `${baseUrl}/payments.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/payments.json?api_token=${FAKTUROWNIA_API_TOKEN}&client_id=${clientId}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       case 'getProducts':
         // Get all products/services
-        response = await fetch(
-          `${baseUrl}/products.json?api_token=${FAKTUROWNIA_API_TOKEN}`,
-          { headers }
-        );
-        data = await response.json();
+        url = `${baseUrl}/products.json?api_token=${FAKTUROWNIA_API_TOKEN}`;
+        response = await fetch(url, { headers });
+        data = await safeJsonParse(response, url.replace(FAKTUROWNIA_API_TOKEN, '***'));
         break;
 
       default:
