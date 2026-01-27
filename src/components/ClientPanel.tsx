@@ -12,7 +12,10 @@ import {
   Loader2, 
   LogOut,
   Search,
-  ExternalLink
+  ExternalLink,
+  Wallet,
+  AlertTriangle,
+  CheckCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +58,29 @@ export const ClientPanel = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [activeTab, setActiveTab] = useState<"info" | "invoices" | "payments">("info");
+
+  // Calculate balance from invoices
+  const calculateBalance = () => {
+    let totalDue = 0;
+    let totalPaid = 0;
+    let unpaidCount = 0;
+
+    invoices.forEach((invoice) => {
+      const gross = parseFloat(invoice.price_gross) || 0;
+      const paid = parseFloat(invoice.paid) || 0;
+      
+      totalPaid += paid;
+      
+      if (invoice.status !== 'paid') {
+        totalDue += gross - paid;
+        unpaidCount++;
+      }
+    });
+
+    return { totalDue, totalPaid, unpaidCount };
+  };
+
+  const balance = calculateBalance();
 
   const searchClient = async () => {
     if (!email) {
@@ -228,7 +254,7 @@ export const ClientPanel = () => {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">{client.name}</h2>
           <p className="text-muted-foreground">{client.email}</p>
@@ -237,6 +263,62 @@ export const ClientPanel = () => {
           <LogOut className="w-4 h-4 mr-2" />
           Wyloguj
         </Button>
+      </div>
+
+      {/* Balance Summary Card */}
+      <div className="grid sm:grid-cols-3 gap-4 mb-6">
+        <div className={cn(
+          "p-5 rounded-xl border",
+          balance.totalDue > 0 
+            ? "bg-red-500/10 border-red-500/30" 
+            : "bg-green-500/10 border-green-500/30"
+        )}>
+          <div className="flex items-center gap-3 mb-2">
+            {balance.totalDue > 0 ? (
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+            ) : (
+              <CheckCircle className="w-5 h-5 text-green-500" />
+            )}
+            <span className="text-sm font-medium text-muted-foreground">Do zapłaty</span>
+          </div>
+          <p className={cn(
+            "text-2xl font-bold",
+            balance.totalDue > 0 ? "text-red-600" : "text-green-600"
+          )}>
+            {balance.totalDue.toFixed(2)} PLN
+          </p>
+          {balance.unpaidCount > 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {balance.unpaidCount} {balance.unpaidCount === 1 ? 'nieopłacona faktura' : 'nieopłacone faktury'}
+            </p>
+          )}
+        </div>
+
+        <div className="p-5 rounded-xl border bg-card border-border">
+          <div className="flex items-center gap-3 mb-2">
+            <Wallet className="w-5 h-5 text-primary" />
+            <span className="text-sm font-medium text-muted-foreground">Suma opłacona</span>
+          </div>
+          <p className="text-2xl font-bold text-foreground">
+            {balance.totalPaid.toFixed(2)} PLN
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Z {invoices.length} {invoices.length === 1 ? 'faktury' : 'faktur'}
+          </p>
+        </div>
+
+        <div className="p-5 rounded-xl border bg-card border-border">
+          <div className="flex items-center gap-3 mb-2">
+            <FileText className="w-5 h-5 text-primary" />
+            <span className="text-sm font-medium text-muted-foreground">Faktury</span>
+          </div>
+          <p className="text-2xl font-bold text-foreground">
+            {invoices.length}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {invoices.filter(i => i.status === 'paid').length} opłaconych
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
