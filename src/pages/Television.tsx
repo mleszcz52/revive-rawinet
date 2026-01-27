@@ -1,9 +1,9 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { JamboxChannels } from "@/components/JamboxChannels";
 import { Check, Tv, Film, Monitor, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
 
 const tvPackages = [
   {
@@ -35,11 +35,6 @@ const tvPackages = [
   },
 ];
 
-const channelLogos = [
-  "TVP1 HD", "TVP2 HD", "Polsat HD", "TVN HD", "TVN 7 HD", "TV4 HD", "TV Puls HD", 
-  "TVP3 HD", "TVP Info HD", "Polsat News HD", "TVN24 HD", "TVN24 BiŚ HD",
-  "TTV HD", "TVN Fabuła HD", "HGTV HD", "Super Polsat HD", "TVN Style HD", "TVN Turbo HD"
-];
 
 const Television = () => {
   return (
@@ -163,27 +158,18 @@ const Television = () => {
           </div>
         </section>
 
-        {/* Channel List */}
+        {/* JAMBOX Channel List Widget */}
         <section className="py-16 lg:py-24 bg-muted/30">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl font-bold text-foreground mb-4">
-                Wybrane kanały
+                Lista <span className="text-gradient">kanałów</span>
               </h2>
               <p className="text-muted-foreground">
-                Oto niektóre z kanałów dostępnych w naszych pakietach.
+                Wybierz pakiet, aby zobaczyć pełną listę dostępnych kanałów.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-              {channelLogos.map((channel) => (
-                <div
-                  key={channel}
-                  className="px-6 py-3 bg-card rounded-lg border border-border text-muted-foreground font-medium"
-                >
-                  {channel}
-                </div>
-              ))}
-            </div>
+            <JamboxChannels />
           </div>
         </section>
 
