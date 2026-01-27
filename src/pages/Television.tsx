@@ -1,36 +1,44 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Check, Tv, Film, Monitor } from "lucide-react";
+import { Check, Tv, Film, Monitor, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const tvPackages = [
   {
     name: "Podstawowy",
-    channels: "60+",
-    price: "29",
-    features: ["Ponad 60 kanałów", "Kanały HD", "TVP, Polsat, TVN", "Kanały dziecięce"],
+    channels: "78",
+    hdChannels: "68",
+    price: "Zapytaj",
+    features: ["78 kanałów telewizyjnych", "68 kanałów w jakości HD", "Telewizja JAMBOX", "Możliwość rozszerzenia o pakiety tematyczne"],
     popular: false,
+    link: "/telewizja/podstawowy",
   },
   {
-    name: "Rozszerzony",
-    channels: "120+",
-    price: "49",
-    features: ["Ponad 120 kanałów", "Kanały HD i Full HD", "Kanały sportowe", "Kanały filmowe", "Kanały dokumentalne"],
+    name: "Korzystny",
+    channels: "136",
+    hdChannels: "119",
+    price: "Zapytaj",
+    features: ["136 kanałów telewizyjnych", "119 kanałów w jakości HD", "Telewizja JAMBOX", "Kanały sportowe i filmowe", "Możliwość rozszerzenia o pakiety premium"],
     popular: true,
+    link: "/telewizja/korzystny",
   },
   {
-    name: "Premium",
-    channels: "180+",
-    price: "79",
-    features: ["Ponad 180 kanałów", "Kanały 4K", "HBO, Canal+", "Wszystkie kanały sportowe", "VOD w cenie", "Nagrywarka DVR"],
+    name: "Bogaty",
+    channels: "179",
+    hdChannels: "152",
+    price: "Zapytaj",
+    features: ["179 kanałów telewizyjnych", "152 kanały w jakości HD", "Telewizja JAMBOX", "Pełna oferta kanałów", "Pakiety tematyczne i premium"],
     popular: false,
+    link: "/telewizja/bogaty",
   },
 ];
 
 const channelLogos = [
-  "TVP1", "TVP2", "Polsat", "TVN", "TV4", "TV Puls", "TVN24", "Polsat News",
-  "Eurosport", "Canal+ Sport", "HBO", "Canal+", "Discovery", "National Geographic"
+  "TVP1 HD", "TVP2 HD", "Polsat HD", "TVN HD", "TVN 7 HD", "TV4 HD", "TV Puls HD", 
+  "TVP3 HD", "TVP Info HD", "Polsat News HD", "TVN24 HD", "TVN24 BiŚ HD",
+  "TTV HD", "TVN Fabuła HD", "HGTV HD", "Super Polsat HD", "TVN Style HD", "TVN Turbo HD"
 ];
 
 const Television = () => {
@@ -43,27 +51,41 @@ const Television = () => {
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-3xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-4">
-                Telewizja Cyfrowa
+                Telewizja JAMBOX
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                 Telewizja <span className="text-gradient">dla każdego</span>
               </h1>
               <p className="text-lg text-white/70 mb-8">
-                Setki kanałów w jakości HD i 4K. Wybierz pakiet dopasowany do Twoich potrzeb.
+                Do 179 kanałów w najwyższej jakości HD. Wybierz pakiet dopasowany do Twoich potrzeb.
               </p>
-              <div className="flex flex-wrap gap-6">
+              <div className="flex flex-wrap gap-6 mb-8">
                 <div className="flex items-center gap-2 text-white/80">
                   <Tv className="w-5 h-5 text-primary" />
-                  <span>Do 180+ kanałów</span>
+                  <span>Do 179 kanałów</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80">
                   <Monitor className="w-5 h-5 text-primary" />
-                  <span>Jakość 4K</span>
+                  <span>Do 152 kanałów HD</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80">
                   <Film className="w-5 h-5 text-primary" />
-                  <span>VOD w cenie</span>
+                  <span>Pakiety premium</span>
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="tel:505051376">
+                  <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                    <Phone className="w-5 h-5 mr-2" />
+                    505 051 376
+                  </Button>
+                </a>
+                <a href="tel:605934593">
+                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                    <Phone className="w-5 h-5 mr-2" />
+                    605 934 593
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
@@ -77,12 +99,12 @@ const Television = () => {
                 Pakiety <span className="text-gradient">telewizyjne</span>
               </h2>
               <p className="text-lg text-muted-foreground">
-                Wybierz pakiet i ciesz się ulubionymi programami w najlepszej jakości.
+                Masz możliwość rozszerzenia swojego pakietu o wybrane pakiety tematyczne oraz premium.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {tvPackages.map((pkg, index) => (
+              {tvPackages.map((pkg) => (
                 <div
                   key={pkg.name}
                   className={cn(
@@ -104,11 +126,11 @@ const Television = () => {
                     <div className="text-center mb-6">
                       <h3 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h3>
                       <p className="text-3xl font-bold text-primary mb-1">{pkg.channels} kanałów</p>
+                      <p className="text-sm text-muted-foreground">w tym {pkg.hdChannels} w jakości HD</p>
                     </div>
 
                     <div className="text-center mb-8">
-                      <span className="text-4xl font-bold text-foreground">{pkg.price}</span>
-                      <span className="text-muted-foreground"> zł/mies.</span>
+                      <span className="text-2xl font-bold text-foreground">{pkg.price}</span>
                     </div>
 
                     <ul className="space-y-3 mb-8">
@@ -122,16 +144,18 @@ const Television = () => {
                       ))}
                     </ul>
 
-                    <Button
-                      className={cn(
-                        "w-full font-semibold",
-                        pkg.popular
-                          ? "gradient-primary text-primary-foreground shadow-glow"
-                          : "bg-secondary text-secondary-foreground"
-                      )}
-                    >
-                      Zamów teraz
-                    </Button>
+                    <a href="tel:505051376">
+                      <Button
+                        className={cn(
+                          "w-full font-semibold",
+                          pkg.popular
+                            ? "gradient-primary text-primary-foreground shadow-glow"
+                            : "bg-secondary text-secondary-foreground"
+                        )}
+                      >
+                        Zadzwoń i zamów
+                      </Button>
+                    </a>
                   </div>
                 </div>
               ))}
@@ -159,6 +183,26 @@ const Television = () => {
                   {channel}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Smart TV Info */}
+        <section className="py-16 lg:py-24">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl font-bold text-foreground mb-6">
+                Smart TV - Oglądaj gdzie chcesz
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Dzięki usłudze Smart TV możesz oglądać telewizję na smartfonie, tablecie lub komputerze. 
+                Telewizja dostępna również przez aplikację JAMBOX GO.
+              </p>
+              <a href="tel:505051376">
+                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  Zapytaj o szczegóły
+                </Button>
+              </a>
             </div>
           </div>
         </section>

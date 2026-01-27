@@ -1,30 +1,30 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RouterOptions } from "@/components/RouterOptions";
-import { Check, Zap, Wifi, Globe } from "lucide-react";
+import { Check, Zap, Wifi, Globe, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const internetPlans = [
   {
-    name: "Start",
-    speed: "100 Mbps",
-    price: "49",
-    features: ["Do 100 Mbps download", "Do 20 Mbps upload", "Bez limitu danych", "Router w cenie"],
+    name: "Komfort",
+    speed: "300 Mbps",
+    price: "Zapytaj",
+    features: ["Prędkość pobierania do 300 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie"],
     popular: false,
   },
   {
-    name: "Standard",
-    speed: "300 Mbps",
-    price: "69",
-    features: ["Do 300 Mbps download", "Do 50 Mbps upload", "Bez limitu danych", "Router Wi-Fi 6", "Publiczny IP"],
+    name: "Premium",
+    speed: "700 Mbps",
+    price: "Zapytaj",
+    features: ["Prędkość pobierania do 700 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie", "Idealne do streamingu 4K"],
     popular: true,
   },
   {
-    name: "Premium",
-    speed: "1 Gbps",
-    price: "99",
-    features: ["Do 1 Gbps download", "Do 300 Mbps upload", "Bez limitu danych", "Router Wi-Fi 6", "Publiczny IP", "Priorytetowe wsparcie"],
+    name: "Biznes",
+    speed: "1000 Mbps",
+    price: "Zapytaj",
+    features: ["Prędkość pobierania do 1000 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie", "Maksymalna wydajność"],
     popular: false,
   },
 ];
@@ -39,27 +39,41 @@ const Internet = () => {
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-3xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-4">
-                Internet Światłowodowy
+                Internet Światłowodowy GPON
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                 Szybki internet <span className="text-gradient">bez limitów</span>
               </h1>
               <p className="text-lg text-white/70 mb-8">
-                Wybierz pakiet dopasowany do Twoich potrzeb. Wszystkie pakiety bez limitu transferu danych.
+                Wybierz pakiet dopasowany do Twoich potrzeb. Sieć światłowodowa GPON na terenie powiatu rawickiego.
               </p>
-              <div className="flex flex-wrap gap-6">
+              <div className="flex flex-wrap gap-6 mb-8">
                 <div className="flex items-center gap-2 text-white/80">
                   <Zap className="w-5 h-5 text-primary" />
                   <span>Do 1 Gbps</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80">
                   <Wifi className="w-5 h-5 text-primary" />
-                  <span>Wi-Fi 6</span>
+                  <span>Światłowód GPON</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80">
                   <Globe className="w-5 h-5 text-primary" />
                   <span>Bez limitu</span>
                 </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="tel:505051376">
+                  <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                    <Phone className="w-5 h-5 mr-2" />
+                    505 051 376
+                  </Button>
+                </a>
+                <a href="tel:605934593">
+                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                    <Phone className="w-5 h-5 mr-2" />
+                    605 934 593
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
@@ -73,12 +87,12 @@ const Internet = () => {
                 Wybierz swój <span className="text-gradient">pakiet</span>
               </h2>
               <p className="text-lg text-muted-foreground">
-                Wszystkie ceny są cenami brutto. Umowa na 24 miesiące.
+                Umowa na czas nieokreślony. Opłata jednorazowa – 249zł + opłata instalacyjna – wycena indywidualna.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {internetPlans.map((plan, index) => (
+              {internetPlans.map((plan) => (
                 <div
                   key={plan.name}
                   className={cn(
@@ -103,8 +117,7 @@ const Internet = () => {
                     </div>
 
                     <div className="text-center mb-8">
-                      <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                      <span className="text-muted-foreground"> zł/mies.</span>
+                      <span className="text-2xl font-bold text-foreground">{plan.price}</span>
                     </div>
 
                     <ul className="space-y-3 mb-8">
@@ -118,19 +131,32 @@ const Internet = () => {
                       ))}
                     </ul>
 
-                    <Button
-                      className={cn(
-                        "w-full font-semibold",
-                        plan.popular
-                          ? "gradient-primary text-primary-foreground shadow-glow"
-                          : "bg-secondary text-secondary-foreground"
-                      )}
-                    >
-                      Zamów teraz
-                    </Button>
+                    <a href="tel:505051376">
+                      <Button
+                        className={cn(
+                          "w-full font-semibold",
+                          plan.popular
+                            ? "gradient-primary text-primary-foreground shadow-glow"
+                            : "bg-secondary text-secondary-foreground"
+                        )}
+                      >
+                        Zadzwoń i zamów
+                      </Button>
+                    </a>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Info Box */}
+            <div className="mt-12 max-w-4xl mx-auto bg-muted/50 rounded-2xl p-6 lg:p-8">
+              <h3 className="text-lg font-bold text-foreground mb-4">Ważne informacje</h3>
+              <ul className="space-y-2 text-muted-foreground text-sm">
+                <li>• Urządzeniem końcowym dostarczanym przez operatora jest konwerter sieci światłowodowej na Ethernet (tzw. ONT).</li>
+                <li>• Klient może podłączyć własny router WiFi lub zakupić rekomendowany przez RawiNet router WiFi TP-Link w cenie 177 zł lub wydzierżawić za 10zł brutto miesięcznie od RawiNet ONT Router firmy HALNY.</li>
+                <li>• Powyższa oferta dotyczy klientów uruchamianych na terenie powiatu rawickiego w sieci światłowodowej GPON.</li>
+                <li>• Deklarowane prędkości pobierania i wysyłania danych (download/upload) są prędkościami maksymalnymi lub przewidywanymi dla danego pakietu usług.</li>
+              </ul>
             </div>
           </div>
         </section>
