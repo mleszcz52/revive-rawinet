@@ -1,51 +1,24 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { User, FileText, CreditCard, Settings, HelpCircle, Phone, Mail, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
-const subscriberOptions = [
-  {
-    icon: User,
-    title: "Moje Konto",
-    description: "Zarządzaj swoimi danymi osobowymi i preferencjami.",
-    action: "Zaloguj się",
-  },
-  {
-    icon: FileText,
-    title: "Faktury",
-    description: "Przeglądaj i pobieraj swoje faktury.",
-    action: "Zobacz faktury",
-  },
-  {
-    icon: CreditCard,
-    title: "Płatności",
-    description: "Sprawdź saldo i historię płatności.",
-    action: "Sprawdź płatności",
-  },
-  {
-    icon: Settings,
-    title: "Ustawienia usług",
-    description: "Zmień pakiet lub dodaj dodatkowe usługi.",
-    action: "Zarządzaj usługami",
-  },
-];
+import { ClientPanel } from "@/components/ClientPanel";
+import { HelpCircle, Phone, Mail, MessageSquare } from "lucide-react";
 
 const faqItems = [
   {
     question: "Jak mogę sprawdzić stan mojego konta?",
-    answer: "Zaloguj się do panelu abonenta, gdzie znajdziesz wszystkie informacje o swoim koncie, fakturach i płatnościach.",
+    answer: "Zaloguj się do panelu klienta powyżej, używając adresu email przypisanego do Twojego konta w systemie Fakturownia.",
   },
   {
     question: "Jak zmienić pakiet internetowy?",
-    answer: "Możesz zmienić pakiet przez panel abonenta lub kontaktując się z naszym biurem obsługi klienta.",
+    answer: "Aby zmienić pakiet, skontaktuj się z naszym biurem obsługi klienta telefonicznie lub mailowo.",
   },
   {
     question: "Co zrobić w przypadku awarii?",
-    answer: "W przypadku awarii skontaktuj się z nami telefonicznie pod numer +48 123 456 789 lub zgłoś problem przez panel abonenta.",
+    answer: "W przypadku awarii skontaktuj się z nami telefonicznie pod numer 505 051 376 lub 605 934 593.",
   },
   {
     question: "Jak skonfigurować router?",
-    answer: "Instrukcje konfiguracji routera znajdziesz w dokumentacji dołączonej do urządzenia lub na naszej stronie w sekcji pomocy.",
+    answer: "Instrukcje konfiguracji routera znajdziesz w dokumentacji dołączonej do urządzenia. W razie problemów zadzwoń do nas.",
   },
 ];
 
@@ -55,7 +28,7 @@ const Subscriber = () => {
       <Header />
       <main className="pt-20 lg:pt-24">
         {/* Hero Section */}
-        <section className="gradient-hero py-16 lg:py-24">
+        <section className="gradient-hero py-16 lg:py-20">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-3xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-4">
@@ -64,36 +37,17 @@ const Subscriber = () => {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                 Dla <span className="text-gradient">Abonenta</span>
               </h1>
-              <p className="text-lg text-white/70 mb-8">
-                Zarządzaj swoim kontem, przeglądaj faktury i uzyskaj pomoc techniczną.
+              <p className="text-lg text-white/70">
+                Zarządzaj swoim kontem, przeglądaj faktury i sprawdzaj płatności.
               </p>
-              <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                Zaloguj się do panelu
-              </Button>
             </div>
           </div>
         </section>
 
-        {/* Subscriber Options */}
+        {/* Client Panel */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {subscriberOptions.map((option) => (
-                <div
-                  key={option.title}
-                  className="group p-6 bg-card rounded-2xl border border-border shadow-card hover:shadow-card-hover hover:border-primary/30 transition-all duration-500"
-                >
-                  <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-4 shadow-glow group-hover:scale-110 transition-transform">
-                    <option.icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2">{option.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{option.description}</p>
-                  <Button variant="ghost" className="p-0 h-auto text-primary hover:text-primary/80">
-                    {option.action} →
-                  </Button>
-                </div>
-              ))}
-            </div>
+            <ClientPanel />
           </div>
         </section>
 
@@ -141,26 +95,29 @@ const Subscriber = () => {
 
             <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <a
-                href="tel:+48123456789"
+                href="tel:505051376"
                 className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
               >
                 <Phone className="w-8 h-8 text-primary mb-3" />
                 <span className="font-semibold text-foreground">Telefon</span>
-                <span className="text-sm text-muted-foreground">+48 123 456 789</span>
+                <span className="text-sm text-muted-foreground">505 051 376</span>
               </a>
               <a
-                href="mailto:pomoc@rawinet.pl"
+                href="tel:605934593"
+                className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
+              >
+                <Phone className="w-8 h-8 text-primary mb-3" />
+                <span className="font-semibold text-foreground">Telefon</span>
+                <span className="text-sm text-muted-foreground">605 934 593</span>
+              </a>
+              <a
+                href="mailto:kontakt@rawinet.pl"
                 className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
               >
                 <Mail className="w-8 h-8 text-primary mb-3" />
                 <span className="font-semibold text-foreground">Email</span>
-                <span className="text-sm text-muted-foreground">pomoc@rawinet.pl</span>
+                <span className="text-sm text-muted-foreground">kontakt@rawinet.pl</span>
               </a>
-              <div className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all cursor-pointer">
-                <MessageSquare className="w-8 h-8 text-primary mb-3" />
-                <span className="font-semibold text-foreground">Czat</span>
-                <span className="text-sm text-muted-foreground">Napisz do nas</span>
-              </div>
             </div>
           </div>
         </section>

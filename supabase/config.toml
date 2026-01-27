@@ -1,1 +1,4 @@
 project_id = "cqbwkhhefnurmddwazsk"
+
+[functions.fakturownia]
+verify_jwt = false
