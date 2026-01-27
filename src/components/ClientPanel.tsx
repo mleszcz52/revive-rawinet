@@ -55,17 +55,38 @@ export const ClientPanel = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [client, setClient] = useState<Client | null>(null);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [activeTab, setActiveTab] = useState<"info" | "invoices" | "payments">("info");
+  const [showAllInvoices, setShowAllInvoices] = useState(false);
 
-  // Calculate balance from invoices
+  // Filter invoices: show all paid + current unpaid (payment_to within last 60 days)
+  const filterRelevantInvoices = (invoicesList: Invoice[]): Invoice[] => {
+    const today = new Date();
+    const cutoffDate = new Date();
+    cutoffDate.setDate(today.getDate() - 60); // 60 dni wstecz
+
+    return invoicesList.filter((invoice) => {
+      // Zawsze pokazuj opłacone
+      if (invoice.status === 'paid') return true;
+
+      // Dla nieopłaconych - sprawdź termin płatności
+      const paymentDate = new Date(invoice.payment_to);
+      return paymentDate >= cutoffDate;
+    });
+  };
+
+  // Get displayed invoices based on filter toggle
+  const displayedInvoices = showAllInvoices ? allInvoices : filterRelevantInvoices(allInvoices);
+  const hiddenCount = allInvoices.length - filterRelevantInvoices(allInvoices).length;
+
+  // Calculate balance from displayed invoices only
   const calculateBalance = () => {
     let totalDue = 0;
     let totalPaid = 0;
     let unpaidCount = 0;
 
-    invoices.forEach((invoice) => {
+    displayedInvoices.forEach((invoice) => {
       const gross = parseFloat(invoice.price_gross) || 0;
       const paid = parseFloat(invoice.paid) || 0;
       
@@ -136,7 +157,7 @@ export const ClientPanel = () => {
       });
 
       if (error) throw error;
-      setInvoices(data || []);
+      setAllInvoices(data || []);
     } catch (error) {
       console.error('Error loading invoices:', error);
     }
@@ -178,10 +199,11 @@ export const ClientPanel = () => {
 
   const logout = () => {
     setClient(null);
-    setInvoices([]);
+    setAllInvoices([]);
     setPayments([]);
     setEmail("");
     setActiveTab("info");
+    setShowAllInvoices(false);
   };
 
   const getStatusBadge = (status: string) => {
@@ -303,7 +325,7 @@ export const ClientPanel = () => {
             {balance.totalPaid.toFixed(2)} PLN
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            Z {invoices.length} {invoices.length === 1 ? 'faktury' : 'faktur'}
+            Z {displayedInvoices.length} {displayedInvoices.length === 1 ? 'faktury' : 'faktur'}
           </p>
         </div>
 
@@ -313,10 +335,11 @@ export const ClientPanel = () => {
             <span className="text-sm font-medium text-muted-foreground">Faktury</span>
           </div>
           <p className="text-2xl font-bold text-foreground">
-            {invoices.length}
+            {displayedInvoices.length}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {invoices.filter(i => i.status === 'paid').length} opłaconych
+            {displayedInvoices.filter(i => i.status === 'paid').length} opłaconych
+            {hiddenCount > 0 && !showAllInvoices && ` • ${hiddenCount} ukrytych`}
           </p>
         </div>
       </div>
@@ -337,7 +360,7 @@ export const ClientPanel = () => {
           className={activeTab === "invoices" ? "gradient-primary text-primary-foreground" : ""}
         >
           <FileText className="w-4 h-4 mr-2" />
-          Faktury ({invoices.length})
+          Faktury ({displayedInvoices.length})
         </Button>
         <Button
           variant={activeTab === "payments" ? "default" : "outline"}
@@ -387,11 +410,11 @@ export const ClientPanel = () => {
 
         {activeTab === "invoices" && (
           <div>
-            {invoices.length === 0 ? (
+            {displayedInvoices.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">Brak faktur</p>
             ) : (
               <div className="space-y-4">
-                {invoices.map((invoice) => (
+                {displayedInvoices.map((invoice) => (
                   <div
                     key={invoice.id}
                     className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50"
@@ -419,6 +442,23 @@ export const ClientPanel = () => {
                     </Button>
                   </div>
                 ))}
+
+                {/* Toggle to show/hide old invoices */}
+                {hiddenCount > 0 && (
+                  <div className="text-center pt-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowAllInvoices(!showAllInvoices)}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {showAllInvoices 
+                        ? "Ukryj stare faktury" 
+                        : `Pokaż ${hiddenCount} ukrytych faktur historycznych`
+                      }
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>
