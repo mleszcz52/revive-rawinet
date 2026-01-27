@@ -40,6 +40,7 @@ interface Invoice {
   price_net: string;
   paid: string;
   currency: string;
+  payment_url?: string | null;
 }
 
 interface Payment {
@@ -432,14 +433,26 @@ export const ClientPanel = () => {
                       <p className="font-bold text-foreground">{invoice.price_gross} {invoice.currency}</p>
                       <p className="text-sm text-muted-foreground">netto: {invoice.price_net} {invoice.currency}</p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadInvoice(invoice.id)}
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      PDF
-                    </Button>
+                    <div className="flex gap-2">
+                      {invoice.status !== 'paid' && invoice.payment_url && (
+                        <Button
+                          size="sm"
+                          className="gradient-primary text-primary-foreground"
+                          onClick={() => window.open(invoice.payment_url!, '_blank')}
+                        >
+                          <CreditCard className="w-4 h-4 mr-1" />
+                          Zapłać
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadInvoice(invoice.id)}
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        PDF
+                      </Button>
+                    </div>
                   </div>
                 ))}
 
