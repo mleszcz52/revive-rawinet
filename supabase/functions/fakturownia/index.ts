@@ -1,10 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, x-supabase-client-platform, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
+
+// Security constants
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MINUTES = 15;
+const PASSWORD_MIN_LENGTH = 8;
 
 // Helper function to safely parse JSON response
 async function safeJsonParse(response: Response, url: string) {
@@ -35,6 +42,53 @@ async function safeJsonParse(response: Response, url: string) {
   }
 }
 
+// Password validation function
+function validatePasswordStrength(password: string): { valid: boolean; message?: string } {
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return { valid: false, message: `Hasło musi mieć minimum ${PASSWORD_MIN_LENGTH} znaków` };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Hasło musi zawierać co najmniej jedną wielką literę' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Hasło musi zawierać co najmniej jedną cyfrę' };
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return { valid: false, message: 'Hasło musi zawierać co najmniej jeden znak specjalny' };
+  }
+  return { valid: true };
+}
+
+// Generate secure random password
+function generateSecurePassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const specialChars = '!@#$%&*';
+  let password = 'Rawi';
+  
+  // Add 6 random alphanumeric characters
+  for (let i = 0; i < 6; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  // Add 1 special character
+  password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
+  
+  // Add 1 more random character
+  password += chars.charAt(Math.floor(Math.random() * chars.length));
+  
+  return password;
+}
+
+// Generate session token
+function generateSessionToken(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+  for (let i = 0; i < 64; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -44,6 +98,304 @@ serve(async (req) => {
   try {
     const FAKTUROWNIA_API_TOKEN = Deno.env.get('FAKTUROWNIA_API_TOKEN');
     const FAKTUROWNIA_DOMAIN = Deno.env.get('FAKTUROWNIA_DOMAIN');
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    // Create Supabase admin client for credential operations
+    const supabaseAdmin = createClient(
+      SUPABASE_URL!,
+      SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const body = await req.json();
+    const { action, clientId, email, invoiceId, password, newPassword, clientName, ipAddress } = body;
+
+    // ============= Authentication Actions =============
+    
+    if (action === 'verifyPassword') {
+      if (!email || !password) {
+        return new Response(
+          JSON.stringify({ error: 'Email i hasło są wymagane' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Get client credentials
+      const { data: credentials, error: credError } = await supabaseAdmin
+        .from('client_credentials')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (credError) {
+        console.error('Database error:', credError);
+        return new Response(
+          JSON.stringify({ error: 'Błąd serwera' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!credentials) {
+        // Log failed attempt for non-existent account (don't reveal if account exists)
+        await supabaseAdmin.from('login_attempts').insert({
+          email: normalizedEmail,
+          success: false,
+          ip_address: ipAddress || null
+        });
+        
+        return new Response(
+          JSON.stringify({ valid: false, message: 'Nieprawidłowy email lub hasło' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Check if account is locked
+      if (credentials.locked_until && new Date(credentials.locked_until) > new Date()) {
+        const remainingMinutes = Math.ceil(
+          (new Date(credentials.locked_until).getTime() - Date.now()) / 60000
+        );
+        
+        await supabaseAdmin.from('login_attempts').insert({
+          email: normalizedEmail,
+          success: false,
+          ip_address: ipAddress || null
+        });
+        
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            locked: true,
+            lockedUntil: credentials.locked_until,
+            message: `Konto zablokowane. Spróbuj ponownie za ${remainingMinutes} minut.`
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Verify password
+      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+
+      if (!passwordValid) {
+        const newFailedAttempts = (credentials.failed_attempts || 0) + 1;
+        const shouldLock = newFailedAttempts >= MAX_FAILED_ATTEMPTS;
+        
+        const updateData: Record<string, unknown> = {
+          failed_attempts: newFailedAttempts
+        };
+        
+        if (shouldLock) {
+          const lockUntil = new Date();
+          lockUntil.setMinutes(lockUntil.getMinutes() + LOCKOUT_DURATION_MINUTES);
+          updateData.locked_until = lockUntil.toISOString();
+        }
+        
+        await supabaseAdmin
+          .from('client_credentials')
+          .update(updateData)
+          .eq('id', credentials.id);
+        
+        await supabaseAdmin.from('login_attempts').insert({
+          email: normalizedEmail,
+          success: false,
+          ip_address: ipAddress || null
+        });
+        
+        const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+        
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            message: shouldLock 
+              ? `Konto zablokowane na ${LOCKOUT_DURATION_MINUTES} minut.`
+              : `Nieprawidłowe hasło. Pozostało prób: ${Math.max(0, remainingAttempts)}`,
+            remainingAttempts: Math.max(0, remainingAttempts),
+            locked: shouldLock
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Password correct - reset failed attempts and update last login
+      await supabaseAdmin
+        .from('client_credentials')
+        .update({
+          failed_attempts: 0,
+          locked_until: null,
+          last_login: new Date().toISOString()
+        })
+        .eq('id', credentials.id);
+      
+      await supabaseAdmin.from('login_attempts').insert({
+        email: normalizedEmail,
+        success: true,
+        ip_address: ipAddress || null
+      });
+
+      // Generate session token
+      const sessionToken = generateSessionToken();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 4); // 4 hour session
+
+      return new Response(
+        JSON.stringify({ 
+          valid: true,
+          mustChangePassword: credentials.must_change_password,
+          clientName: credentials.client_name,
+          sessionToken,
+          expiresAt: expiresAt.toISOString()
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'changePassword') {
+      if (!email || !password || !newPassword) {
+        return new Response(
+          JSON.stringify({ error: 'Wszystkie pola są wymagane' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Validate new password strength
+      const validation = validatePasswordStrength(newPassword);
+      if (!validation.valid) {
+        return new Response(
+          JSON.stringify({ success: false, message: validation.message }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Get current credentials
+      const { data: credentials, error: credError } = await supabaseAdmin
+        .from('client_credentials')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (credError || !credentials) {
+        return new Response(
+          JSON.stringify({ success: false, message: 'Nie znaleziono konta' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Verify current password
+      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+      if (!passwordValid) {
+        return new Response(
+          JSON.stringify({ success: false, message: 'Nieprawidłowe aktualne hasło' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Hash new password with cost 12
+      const newPasswordHash = await bcrypt.hash(newPassword);
+
+      // Update password
+      const { error: updateError } = await supabaseAdmin
+        .from('client_credentials')
+        .update({
+          password_hash: newPasswordHash,
+          must_change_password: false
+        })
+        .eq('id', credentials.id);
+
+      if (updateError) {
+        console.error('Update error:', updateError);
+        return new Response(
+          JSON.stringify({ success: false, message: 'Błąd podczas zmiany hasła' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Hasło zostało zmienione' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'setClientPassword') {
+      // Admin action - generate and set password for client
+      if (!email) {
+        return new Response(
+          JSON.stringify({ error: 'Email jest wymagany' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+      const generatedPassword = generateSecurePassword();
+      const passwordHash = await bcrypt.hash(generatedPassword);
+
+      // Upsert client credentials
+      const { error: upsertError } = await supabaseAdmin
+        .from('client_credentials')
+        .upsert({
+          email: normalizedEmail,
+          password_hash: passwordHash,
+          client_name: clientName || null,
+          must_change_password: true,
+          failed_attempts: 0,
+          locked_until: null
+        }, {
+          onConflict: 'email'
+        });
+
+      if (upsertError) {
+        console.error('Upsert error:', upsertError);
+        return new Response(
+          JSON.stringify({ success: false, error: 'Błąd podczas zapisywania' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          generatedPassword,
+          message: 'Hasło zostało wygenerowane. Przekaż je klientowi bezpiecznie.'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'unlockAccount') {
+      // Admin action - unlock a locked account
+      if (!email) {
+        return new Response(
+          JSON.stringify({ error: 'Email jest wymagany' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      const { error: updateError } = await supabaseAdmin
+        .from('client_credentials')
+        .update({
+          failed_attempts: 0,
+          locked_until: null
+        })
+        .eq('email', normalizedEmail);
+
+      if (updateError) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Błąd podczas odblokowywania' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Konto zostało odblokowane' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ============= Fakturownia API Actions =============
 
     if (!FAKTUROWNIA_API_TOKEN || !FAKTUROWNIA_DOMAIN) {
       return new Response(
@@ -51,8 +403,6 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    const { action, clientId, email, invoiceId } = await req.json();
 
     // Clean domain - remove https:// or http:// prefix if present, and handle .fakturownia.pl suffix
     let domain = FAKTUROWNIA_DOMAIN.replace(/^https?:\/\//, '');

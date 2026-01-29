@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      client_credentials: {
+        Row: {
+          client_name: string | null
+          created_at: string | null
+          email: string
+          failed_attempts: number | null
+          id: string
+          last_login: string | null
+          locked_until: string | null
+          must_change_password: boolean | null
+          password_hash: string
+          updated_at: string | null
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string | null
+          email: string
+          failed_attempts?: number | null
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          must_change_password?: boolean | null
+          password_hash: string
+          updated_at?: string | null
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string | null
+          email?: string
+          failed_attempts?: number | null
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          must_change_password?: boolean | null
+          password_hash?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      login_attempts: {
+        Row: {
+          attempted_at: string | null
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          attempted_at?: string | null
+          email: string
+          id?: string
+          ip_address?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          attempted_at?: string | null
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

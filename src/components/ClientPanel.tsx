@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,14 @@ import {
   Loader2, 
   LogOut,
   Search,
-  ExternalLink,
   Wallet,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Lock,
+  Eye,
+  EyeOff,
+  Shield,
+  KeyRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,15 +55,99 @@ interface Payment {
   invoice_id?: number;
 }
 
+interface Session {
+  email: string;
+  clientName: string | null;
+  sessionToken: string;
+  expiresAt: string;
+  mustChangePassword: boolean;
+}
+
+// Session management
+const SESSION_KEY = 'rawinet_client_session';
+
+const saveSession = (session: Session) => {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+};
+
+const getSession = (): Session | null => {
+  try {
+    const data = sessionStorage.getItem(SESSION_KEY);
+    if (!data) return null;
+    
+    const session = JSON.parse(data) as Session;
+    
+    // Check if session expired
+    if (new Date(session.expiresAt) < new Date()) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    
+    return session;
+  } catch {
+    return null;
+  }
+};
+
+const clearSession = () => {
+  sessionStorage.removeItem(SESSION_KEY);
+};
+
+// Password validation
+const validatePassword = (password: string): { valid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  
+  if (password.length < 8) {
+    errors.push('Minimum 8 znaków');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Co najmniej 1 wielka litera');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('Co najmniej 1 cyfra');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('Co najmniej 1 znak specjalny');
+  }
+  
+  return { valid: errors.length === 0, errors };
+};
+
 export const ClientPanel = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  
+  // Password change state
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  
+  // Client data
   const [client, setClient] = useState<Client | null>(null);
   const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [activeTab, setActiveTab] = useState<"info" | "invoices" | "payments">("info");
   const [showAllInvoices, setShowAllInvoices] = useState(false);
+
+  // Restore session on mount
+  useEffect(() => {
+    const savedSession = getSession();
+    if (savedSession) {
+      setSession(savedSession);
+      setMustChangePassword(savedSession.mustChangePassword);
+      // Load client data if session exists and password was changed
+      if (!savedSession.mustChangePassword) {
+        loadClientDataByEmail(savedSession.email);
+      }
+    }
+  }, []);
 
   // Filter invoices: show all paid + current unpaid (payment_to within last 60 days)
   const filterRelevantInvoices = (invoicesList: Invoice[]): Invoice[] => {
@@ -104,11 +192,29 @@ export const ClientPanel = () => {
 
   const balance = calculateBalance();
 
-  const searchClient = async () => {
-    if (!email) {
+  const loadClientDataByEmail = async (clientEmail: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: { action: 'getClientByEmail', email: clientEmail }
+      });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setClient(data[0]);
+        await loadInvoices(data[0].id);
+        await loadPayments(data[0].id);
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!email || !password) {
       toast({
         title: "Błąd",
-        description: "Wprowadź adres email",
+        description: "Wprowadź adres email i hasło",
         variant: "destructive",
       });
       return;
@@ -118,36 +224,147 @@ export const ClientPanel = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('fakturownia', {
-        body: { action: 'getClientByEmail', email }
+        body: { 
+          action: 'verifyPassword', 
+          email,
+          password
+        }
       });
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        setClient(data[0]);
+      if (data.locked) {
         toast({
-          title: "Sukces",
-          description: "Znaleziono konto klienta",
-        });
-        // Load invoices automatically
-        await loadInvoices(data[0].id);
-        await loadPayments(data[0].id);
-      } else {
-        toast({
-          title: "Nie znaleziono",
-          description: "Nie znaleziono klienta o podanym adresie email",
+          title: "Konto zablokowane",
+          description: data.message,
           variant: "destructive",
+        });
+        return;
+      }
+
+      if (!data.valid) {
+        toast({
+          title: "Błąd logowania",
+          description: data.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Login successful
+      const newSession: Session = {
+        email: email.toLowerCase().trim(),
+        clientName: data.clientName,
+        sessionToken: data.sessionToken,
+        expiresAt: data.expiresAt,
+        mustChangePassword: data.mustChangePassword
+      };
+
+      saveSession(newSession);
+      setSession(newSession);
+      setMustChangePassword(data.mustChangePassword);
+      setCurrentPassword(password); // Save for password change form
+
+      if (!data.mustChangePassword) {
+        // Load client data
+        await loadClientDataByEmail(email);
+        toast({
+          title: "Zalogowano",
+          description: "Witamy w panelu klienta",
         });
       }
     } catch (error) {
-      console.error('Error searching client:', error);
+      console.error('Login error:', error);
       toast({
         title: "Błąd",
-        description: "Wystąpił błąd podczas wyszukiwania. Spróbuj ponownie.",
+        description: "Wystąpił błąd podczas logowania. Spróbuj ponownie.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+      setPassword(""); // Clear password from memory
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (!newPassword || !confirmPassword) {
+      toast({
+        title: "Błąd",
+        description: "Wypełnij wszystkie pola",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Błąd",
+        description: "Hasła nie są identyczne",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const validation = validatePassword(newPassword);
+    if (!validation.valid) {
+      toast({
+        title: "Hasło nie spełnia wymagań",
+        description: validation.errors.join(', '),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: { 
+          action: 'changePassword', 
+          email: session?.email,
+          password: currentPassword,
+          newPassword
+        }
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        toast({
+          title: "Błąd",
+          description: data.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update session
+      const updatedSession = { ...session!, mustChangePassword: false };
+      saveSession(updatedSession);
+      setSession(updatedSession);
+      setMustChangePassword(false);
+
+      // Clear password fields
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      toast({
+        title: "Hasło zmienione",
+        description: "Twoje hasło zostało pomyślnie zmienione",
+      });
+
+      // Load client data
+      await loadClientDataByEmail(session!.email);
+    } catch (error) {
+      console.error('Password change error:', error);
+      toast({
+        title: "Błąd",
+        description: "Wystąpił błąd podczas zmiany hasła",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -199,12 +416,19 @@ export const ClientPanel = () => {
   };
 
   const logout = () => {
+    clearSession();
+    setSession(null);
     setClient(null);
     setAllInvoices([]);
     setPayments([]);
     setEmail("");
+    setPassword("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
     setActiveTab("info");
     setShowAllInvoices(false);
+    setMustChangePassword(false);
   };
 
   const getStatusBadge = (status: string) => {
@@ -218,8 +442,124 @@ export const ClientPanel = () => {
     return <span className={cn("px-2 py-1 rounded-full text-xs font-medium", className)}>{label}</span>;
   };
 
+  const passwordValidation = validatePassword(newPassword);
+
+  // Password change form (shown after first login with generated password)
+  if (session && mustChangePassword) {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-amber-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Zmień hasło</h2>
+            <p className="text-muted-foreground mt-2">
+              Dla bezpieczeństwa Twoich danych, zmień tymczasowe hasło na własne
+            </p>
+          </div>
+
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
+              <div className="text-sm text-amber-700">
+                <p className="font-medium">Wymagana zmiana hasła</p>
+                <p className="text-amber-600 mt-1">
+                  Musisz zmienić hasło aby uzyskać dostęp do panelu klienta.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="newPassword">Nowe hasło</Label>
+              <div className="relative">
+                <Input
+                  id="newPassword"
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="Wprowadź nowe hasło"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              
+              {/* Password requirements */}
+              <div className="mt-2 space-y-1">
+                {['Minimum 8 znaków', 'Co najmniej 1 wielka litera', 'Co najmniej 1 cyfra', 'Co najmniej 1 znak specjalny'].map((req, i) => {
+                  const checks = [
+                    newPassword.length >= 8,
+                    /[A-Z]/.test(newPassword),
+                    /[0-9]/.test(newPassword),
+                    /[!@#$%^&*(),.?":{}|<>]/.test(newPassword)
+                  ];
+                  const met = checks[i];
+                  return (
+                    <div key={req} className={cn("flex items-center gap-2 text-xs", met ? "text-green-600" : "text-muted-foreground")}>
+                      <CheckCircle className={cn("w-3 h-3", met ? "opacity-100" : "opacity-30")} />
+                      {req}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="confirmPassword">Potwierdź hasło</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Powtórz nowe hasło"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {confirmPassword && newPassword !== confirmPassword && (
+                <p className="text-xs text-red-500 mt-1">Hasła nie są identyczne</p>
+              )}
+            </div>
+
+            <Button 
+              onClick={handlePasswordChange} 
+              disabled={isChangingPassword || !passwordValidation.valid || newPassword !== confirmPassword}
+              className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
+            >
+              {isChangingPassword ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Zmieniam hasło...
+                </>
+              ) : (
+                <>
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  Zmień hasło
+                </>
+              )}
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              onClick={logout}
+              className="w-full"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Wyloguj
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Login form
-  if (!client) {
+  if (!session) {
     return (
       <div className="max-w-md mx-auto">
         <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
@@ -229,7 +569,7 @@ export const ClientPanel = () => {
             </div>
             <h2 className="text-2xl font-bold text-foreground">Panel Klienta</h2>
             <p className="text-muted-foreground mt-2">
-              Wprowadź swój adres email, aby uzyskać dostęp do konta
+              Wprowadź swój adres email i hasło, aby uzyskać dostęp do konta
             </p>
           </div>
 
@@ -242,32 +582,55 @@ export const ClientPanel = () => {
                 placeholder="twoj@email.pl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && searchClient()}
+                onKeyDown={(e) => e.key === "Enter" && document.getElementById('password')?.focus()}
               />
             </div>
 
+            <div>
+              <Label htmlFor="password">Hasło</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Wprowadź hasło"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
             <Button 
-              onClick={searchClient} 
+              onClick={handleLogin} 
               disabled={isLoading}
               className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Wyszukiwanie...
+                  Logowanie...
                 </>
               ) : (
                 <>
-                  <Search className="w-4 h-4 mr-2" />
+                  <Lock className="w-4 h-4 mr-2" />
                   Zaloguj się
                 </>
               )}
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            Dane pobierane są z systemu Fakturownia
-          </p>
+          <div className="flex items-center gap-2 justify-center mt-6 text-xs text-muted-foreground">
+            <Shield className="w-4 h-4" />
+            <span>Połączenie szyfrowane SSL</span>
+          </div>
         </div>
       </div>
     );
@@ -279,8 +642,8 @@ export const ClientPanel = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">{client.name}</h2>
-          <p className="text-muted-foreground">{client.email}</p>
+          <h2 className="text-2xl font-bold text-foreground">{client?.name || session.clientName || 'Klient'}</h2>
+          <p className="text-muted-foreground">{client?.email || session.email}</p>
         </div>
         <Button variant="outline" onClick={logout}>
           <LogOut className="w-4 h-4 mr-2" />
@@ -375,7 +738,7 @@ export const ClientPanel = () => {
 
       {/* Tab Content */}
       <div className="bg-card rounded-2xl border border-border p-6 shadow-card">
-        {activeTab === "info" && (
+        {activeTab === "info" && client && (
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <Label className="text-muted-foreground">Nazwa / Imię i nazwisko</Label>
@@ -406,6 +769,13 @@ export const ClientPanel = () => {
                 </p>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "info" && !client && (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+            <p className="text-muted-foreground mt-2">Ładowanie danych...</p>
           </div>
         )}
 
