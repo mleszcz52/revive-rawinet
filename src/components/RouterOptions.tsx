@@ -133,8 +133,8 @@ export const RouterOptions = () => {
               )}
 
               <div className={cn("p-6 lg:p-8", option.recommended && "pt-14")}>
-                {/* Router Image */}
-                <div className="relative h-40 mb-6 flex items-center justify-center">
+              {/* Router Image */}
+                <div className="relative h-40 mb-6 flex items-center justify-center bg-white rounded-xl p-4">
                   <img
                     src={option.image}
                     alt={option.title}
