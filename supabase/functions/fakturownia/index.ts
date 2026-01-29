@@ -395,6 +395,206 @@ serve(async (req) => {
       );
     }
 
+    if (action === 'verifyAdminPassword') {
+      if (!email || !password) {
+        return new Response(
+          JSON.stringify({ error: 'Email i hasło są wymagane' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Get admin credentials
+      const { data: credentials, error: credError } = await supabaseAdmin
+        .from('admin_credentials')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (credError) {
+        console.error('Database error:', credError);
+        return new Response(
+          JSON.stringify({ error: 'Błąd serwera' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!credentials) {
+        return new Response(
+          JSON.stringify({ valid: false, message: 'Nieprawidłowy email lub hasło' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Check if account is locked
+      if (credentials.locked_until && new Date(credentials.locked_until) > new Date()) {
+        const remainingMinutes = Math.ceil(
+          (new Date(credentials.locked_until).getTime() - Date.now()) / 60000
+        );
+        
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            locked: true,
+            message: `Konto zablokowane. Spróbuj ponownie za ${remainingMinutes} minut.`
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Verify password
+      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+
+      if (!passwordValid) {
+        const newFailedAttempts = (credentials.failed_attempts || 0) + 1;
+        const shouldLock = newFailedAttempts >= MAX_FAILED_ATTEMPTS;
+        
+        const updateData: Record<string, unknown> = {
+          failed_attempts: newFailedAttempts
+        };
+        
+        if (shouldLock) {
+          const lockUntil = new Date();
+          lockUntil.setMinutes(lockUntil.getMinutes() + LOCKOUT_DURATION_MINUTES);
+          updateData.locked_until = lockUntil.toISOString();
+        }
+        
+        await supabaseAdmin
+          .from('admin_credentials')
+          .update(updateData)
+          .eq('id', credentials.id);
+        
+        const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+        
+        return new Response(
+          JSON.stringify({ 
+            valid: false, 
+            message: shouldLock 
+              ? `Konto zablokowane na ${LOCKOUT_DURATION_MINUTES} minut.`
+              : `Nieprawidłowe hasło. Pozostało prób: ${Math.max(0, remainingAttempts)}`,
+            remainingAttempts: Math.max(0, remainingAttempts),
+            locked: shouldLock
+          }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Password correct - reset failed attempts
+      await supabaseAdmin
+        .from('admin_credentials')
+        .update({
+          failed_attempts: 0,
+          locked_until: null,
+          last_login: new Date().toISOString()
+        })
+        .eq('id', credentials.id);
+
+      // Generate session token
+      const sessionToken = generateSessionToken();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 4); // 4 hour session
+
+      return new Response(
+        JSON.stringify({ 
+          valid: true,
+          sessionToken,
+          expiresAt: expiresAt.toISOString()
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'getAllClients') {
+      // Get all clients from Fakturownia
+      if (!FAKTUROWNIA_API_TOKEN || !FAKTUROWNIA_DOMAIN) {
+        return new Response(
+          JSON.stringify({ error: 'Fakturownia credentials not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      let domain = FAKTUROWNIA_DOMAIN.replace(/^https?:\/\//, '');
+      if (!domain.includes('.fakturownia.pl')) {
+        domain = `${domain}.fakturownia.pl`;
+      }
+      const baseUrl = `https://${domain}`;
+      const apiTokenParam = encodeURIComponent(FAKTUROWNIA_API_TOKEN);
+
+      const page = body.page || 1;
+      const url = `${baseUrl}/clients.json?api_token=${apiTokenParam}&page=${page}&per_page=50`;
+      
+      const response = await fetch(url, { 
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      const data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
+
+      // Get credential status from database
+      const emails = data.map((c: { email: string }) => c.email?.toLowerCase()).filter(Boolean);
+      const { data: credentials } = await supabaseAdmin
+        .from('client_credentials')
+        .select('email, must_change_password, failed_attempts, locked_until, last_login')
+        .in('email', emails);
+
+      const credMap = new Map(credentials?.map(c => [c.email, c]) || []);
+
+      const clientsWithStatus = data.map((client: { email: string; id: number; name: string }) => ({
+        ...client,
+        hasCredentials: credMap.has(client.email?.toLowerCase()),
+        credentialStatus: credMap.get(client.email?.toLowerCase()) || null
+      }));
+
+      return new Response(
+        JSON.stringify(clientsWithStatus),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'getClientCredentialsList') {
+      // Get all client credentials from database
+      const { data: credentials, error } = await supabaseAdmin
+        .from('client_credentials')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return new Response(
+          JSON.stringify({ error: 'Błąd pobierania danych' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify(credentials),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'getLoginHistory') {
+      // Get login attempts history
+      const { data: attempts, error } = await supabaseAdmin
+        .from('login_attempts')
+        .select('*')
+        .order('attempted_at', { ascending: false })
+        .limit(100);
+
+      if (error) {
+        return new Response(
+          JSON.stringify({ error: 'Błąd pobierania historii' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify(attempts),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // ============= Fakturownia API Actions =============
 
     if (!FAKTUROWNIA_API_TOKEN || !FAKTUROWNIA_DOMAIN) {
