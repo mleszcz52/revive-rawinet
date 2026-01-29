@@ -331,7 +331,7 @@ serve(async (req) => {
       const generatedPassword = generateSecurePassword();
       const passwordHash = hashSync(generatedPassword);
 
-      // Upsert client credentials
+      // Upsert client credentials - store the generated password temporarily for admin viewing
       const { error: upsertError } = await supabaseAdmin
         .from('client_credentials')
         .upsert({
@@ -340,7 +340,8 @@ serve(async (req) => {
           client_name: clientName || null,
           must_change_password: true,
           failed_attempts: 0,
-          locked_until: null
+          locked_until: null,
+          temp_password: generatedPassword // Store temporarily for admin viewing
         }, {
           onConflict: 'email'
         });
@@ -358,6 +359,98 @@ serve(async (req) => {
           success: true, 
           generatedPassword,
           message: 'Hasło zostało wygenerowane. Przekaż je klientowi bezpiecznie.'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'getClientInvoicesAdmin') {
+      // Admin action - get invoices for a client by email
+      if (!FAKTUROWNIA_API_TOKEN || !FAKTUROWNIA_DOMAIN) {
+        return new Response(
+          JSON.stringify({ error: 'Fakturownia credentials not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!email) {
+        return new Response(
+          JSON.stringify({ error: 'Email jest wymagany' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      let domain = FAKTUROWNIA_DOMAIN.replace(/^https?:\/\//, '');
+      if (!domain.includes('.fakturownia.pl')) {
+        domain = `${domain}.fakturownia.pl`;
+      }
+      const baseUrl = `https://${domain}`;
+      const apiTokenParam = encodeURIComponent(FAKTUROWNIA_API_TOKEN);
+
+      // First find the client by email
+      const clientUrl = `${baseUrl}/clients.json?api_token=${apiTokenParam}&email=${encodeURIComponent(email)}`;
+      const clientResponse = await fetch(clientUrl, { 
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      const clients = await safeJsonParse(clientResponse, clientUrl.replace(apiTokenParam, '***'));
+
+      if (!clients || clients.length === 0) {
+        return new Response(
+          JSON.stringify({ invoices: [], client: null }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const client = clients[0];
+
+      // Get invoices for this client
+      const invoicesUrl = `${baseUrl}/invoices.json?api_token=${apiTokenParam}&client_id=${client.id}`;
+      const invoicesResponse = await fetch(invoicesUrl, { 
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      const invoices = await safeJsonParse(invoicesResponse, invoicesUrl.replace(apiTokenParam, '***'));
+
+      return new Response(
+        JSON.stringify({ invoices, client }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'getClientTempPassword') {
+      // Admin action - get temp password for a client
+      if (!email) {
+        return new Response(
+          JSON.stringify({ error: 'Email jest wymagany' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      const { data: credentials, error } = await supabaseAdmin
+        .from('client_credentials')
+        .select('temp_password, must_change_password')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (error || !credentials) {
+        return new Response(
+          JSON.stringify({ tempPassword: null }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Only return temp password if must_change_password is true (hasn't been changed yet)
+      return new Response(
+        JSON.stringify({ 
+          tempPassword: credentials.must_change_password ? credentials.temp_password : null,
+          mustChangePassword: credentials.must_change_password
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
