@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { hashSync, compareSync } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -175,7 +175,7 @@ serve(async (req) => {
       }
 
       // Verify password
-      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+      const passwordValid = compareSync(password, credentials.password_hash);
 
       if (!passwordValid) {
         const newFailedAttempts = (credentials.failed_attempts || 0) + 1;
@@ -284,7 +284,7 @@ serve(async (req) => {
       }
 
       // Verify current password
-      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+      const passwordValid = compareSync(password, credentials.password_hash);
       if (!passwordValid) {
         return new Response(
           JSON.stringify({ success: false, message: 'Nieprawidłowe aktualne hasło' }),
@@ -293,7 +293,7 @@ serve(async (req) => {
       }
 
       // Hash new password with cost 12
-      const newPasswordHash = await bcrypt.hash(newPassword);
+      const newPasswordHash = hashSync(newPassword);
 
       // Update password
       const { error: updateError } = await supabaseAdmin
@@ -329,7 +329,7 @@ serve(async (req) => {
 
       const normalizedEmail = email.toLowerCase().trim();
       const generatedPassword = generateSecurePassword();
-      const passwordHash = await bcrypt.hash(generatedPassword);
+      const passwordHash = hashSync(generatedPassword);
 
       // Upsert client credentials
       const { error: upsertError } = await supabaseAdmin
@@ -444,7 +444,7 @@ serve(async (req) => {
       }
 
       // Verify password
-      const passwordValid = await bcrypt.compare(password, credentials.password_hash);
+      const passwordValid = compareSync(password, credentials.password_hash);
 
       if (!passwordValid) {
         const newFailedAttempts = (credentials.failed_attempts || 0) + 1;
@@ -501,6 +501,56 @@ serve(async (req) => {
           sessionToken,
           expiresAt: expiresAt.toISOString()
         }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (action === 'initializeAdminAccount') {
+      // One-time action to initialize admin account
+      if (!email || !password) {
+        return new Response(
+          JSON.stringify({ error: 'Email i hasło są wymagane' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Check if admin already exists
+      const { data: existing } = await supabaseAdmin
+        .from('admin_credentials')
+        .select('id')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (existing) {
+        return new Response(
+          JSON.stringify({ success: false, message: 'Admin już istnieje' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Hash password with bcrypt
+      const passwordHash = hashSync(password);
+
+      // Insert admin
+      const { error: insertError } = await supabaseAdmin
+        .from('admin_credentials')
+        .insert({
+          email: normalizedEmail,
+          password_hash: passwordHash
+        });
+
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        return new Response(
+          JSON.stringify({ success: false, error: 'Błąd podczas tworzenia konta' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Konto admina utworzone' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

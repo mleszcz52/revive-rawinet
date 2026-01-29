@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_credentials: {
+        Row: {
+          created_at: string | null
+          email: string
+          failed_attempts: number | null
+          id: string
+          last_login: string | null
+          locked_until: string | null
+          password_hash: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          failed_attempts?: number | null
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          password_hash: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          failed_attempts?: number | null
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          password_hash?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       client_credentials: {
         Row: {
           client_name: string | null

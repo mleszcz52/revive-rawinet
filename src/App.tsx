@@ -10,6 +10,7 @@ import Television from "./pages/Television";
 import InternetTV from "./pages/InternetTV";
 import Business from "./pages/Business";
 import Subscriber from "./pages/Subscriber";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/internet-telewizja" element={<InternetTV />} />
           <Route path="/biznes" element={<Business />} />
           <Route path="/dla-abonenta" element={<Subscriber />} />
+          <Route path="/admin" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
