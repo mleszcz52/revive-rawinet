@@ -58,6 +58,7 @@ export type Database = {
           locked_until: string | null
           must_change_password: boolean | null
           password_hash: string
+          temp_password: string | null
           updated_at: string | null
         }
         Insert: {
@@ -70,6 +71,7 @@ export type Database = {
           locked_until?: string | null
           must_change_password?: boolean | null
           password_hash: string
+          temp_password?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -82,6 +84,7 @@ export type Database = {
           locked_until?: string | null
           must_change_password?: boolean | null
           password_hash?: string
+          temp_password?: string | null
           updated_at?: string | null
         }
         Relationships: []

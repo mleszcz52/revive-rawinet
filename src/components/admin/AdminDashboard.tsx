@@ -11,6 +11,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Users,
   Key,
   History,
@@ -23,6 +29,10 @@ import {
   XCircle,
   Clock,
   Loader2,
+  Eye,
+  FileText,
+  Download,
+  EyeOff,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -55,6 +65,7 @@ interface ClientCredential {
   locked_until: string | null;
   last_login: string | null;
   created_at: string;
+  temp_password?: string | null;
 }
 
 interface LoginAttempt {
@@ -66,6 +77,16 @@ interface LoginAttempt {
   attempted_at: string;
 }
 
+interface Invoice {
+  id: number;
+  number: string;
+  issue_date: string;
+  payment_to: string;
+  price_gross: string;
+  status: string;
+  paid: string;
+}
+
 export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [clients, setClients] = useState<FakturowniaClient[]>([]);
   const [credentials, setCredentials] = useState<ClientCredential[]>([]);
@@ -74,6 +95,14 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [generatingPassword, setGeneratingPassword] = useState<string | null>(null);
   const [unlockingAccount, setUnlockingAccount] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<FakturowniaClient | null>(null);
+  const [clientInvoices, setClientInvoices] = useState<Invoice[]>([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordClient, setPasswordClient] = useState<{ email: string; name: string } | null>(null);
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [loadingTempPassword, setLoadingTempPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -148,6 +177,52 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       toast.error("Błąd podczas generowania hasła");
     } finally {
       setGeneratingPassword(null);
+    }
+  };
+
+  const viewClientDetails = async (client: FakturowniaClient) => {
+    setSelectedClient(client);
+    setLoadingInvoices(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("fakturownia", {
+        body: {
+          action: "getClientInvoicesAdmin",
+          email: client.email,
+        },
+      });
+
+      if (error) throw error;
+      setClientInvoices(data?.invoices || []);
+    } catch (err) {
+      console.error("Error loading invoices:", err);
+      toast.error("Błąd podczas ładowania faktur");
+    } finally {
+      setLoadingInvoices(false);
+    }
+  };
+
+  const viewTempPassword = async (email: string, name: string) => {
+    setPasswordClient({ email, name });
+    setShowPasswordDialog(true);
+    setLoadingTempPassword(true);
+    setTempPassword(null);
+    setShowPassword(false);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("fakturownia", {
+        body: {
+          action: "getClientTempPassword",
+          email,
+        },
+      });
+
+      if (error) throw error;
+      setTempPassword(data?.tempPassword || null);
+    } catch (err) {
+      console.error("Error loading temp password:", err);
+      toast.error("Błąd podczas ładowania hasła");
+    } finally {
+      setLoadingTempPassword(false);
     }
   };
 
@@ -286,7 +361,25 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => viewClientDetails(client)}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Podgląd
+                        </Button>
+                        {client.hasCredentials && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => viewTempPassword(client.email, client.name)}
+                          >
+                            <Key className="w-4 h-4 mr-1" />
+                            Hasło
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant={client.hasCredentials ? "outline" : "default"}
@@ -388,6 +481,16 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                               )}
                             </Button>
                           )}
+                          {cred.must_change_password && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => viewTempPassword(cred.email, cred.client_name || "")}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Hasło
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="ghost"
@@ -463,6 +566,129 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Client Details Dialog (Invoices) */}
+      <Dialog open={!!selectedClient} onOpenChange={() => setSelectedClient(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Faktury klienta: {selectedClient?.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              Email: {selectedClient?.email}
+            </div>
+
+            {loadingInvoices ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : clientInvoices.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Brak faktur dla tego klienta
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Numer</TableHead>
+                    <TableHead>Data wystawienia</TableHead>
+                    <TableHead>Termin płatności</TableHead>
+                    <TableHead>Kwota brutto</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {clientInvoices.map((invoice) => {
+                    const isPaid = invoice.status === "paid" || invoice.paid === invoice.price_gross;
+                    return (
+                      <TableRow key={invoice.id}>
+                        <TableCell className="font-medium">{invoice.number}</TableCell>
+                        <TableCell>{invoice.issue_date}</TableCell>
+                        <TableCell>{invoice.payment_to}</TableCell>
+                        <TableCell>{parseFloat(invoice.price_gross).toFixed(2)} zł</TableCell>
+                        <TableCell>
+                          {isPaid ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+                              <CheckCircle className="w-3 h-3" />
+                              Opłacona
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 text-xs font-medium">
+                              <Clock className="w-3 h-3" />
+                              Nieopłacona
+                            </span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password View Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              Hasło tymczasowe
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              Klient: {passwordClient?.name || passwordClient?.email}
+            </div>
+
+            {loadingTempPassword ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : tempPassword ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 bg-muted p-3 rounded-lg">
+                  <code className="flex-1 text-lg font-mono">
+                    {showPassword ? tempPassword : "••••••••••••"}
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      navigator.clipboard.writeText(tempPassword);
+                      toast.success("Skopiowano do schowka");
+                    }}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  To hasło tymczasowe będzie widoczne tylko do momentu, gdy klient je zmieni.
+                </p>
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                <p>Brak hasła tymczasowego.</p>
+                <p className="text-xs mt-1">Klient już zmienił hasło lub nie wygenerowano jeszcze dostępu.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
