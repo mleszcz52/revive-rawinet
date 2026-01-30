@@ -37,7 +37,7 @@ export const SpeedTestSection = () => {
             <h3 className="text-xl font-semibold text-foreground mb-4 text-center">
               Test prędkości FIREPROBE
             </h3>
-            <div className="aspect-video w-full max-w-2xl mx-auto rounded-lg overflow-hidden">
+            <div className="w-full mx-auto rounded-lg overflow-hidden" style={{ height: '500px' }}>
               <iframe
                 src="https://demo.fireprobe.net/?lang=pl&theme=dark"
                 className="w-full h-full border-0"
