@@ -22,7 +22,9 @@ export const Footer = () => {
             </p>
             <div className="flex gap-3">
               <a 
-                href="#" 
+                href="https://www.facebook.com/p/Rawi-Net-niezawodny-światłowód-100077080039545/" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors"
               >
                 <Facebook className="w-5 h-5" />
