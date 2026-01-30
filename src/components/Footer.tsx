@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook } from "lucide-react";
 import logoRawinet from "@/assets/logo-rawinet.png";
 
 export const Footer = () => {
@@ -28,12 +28,6 @@ export const Footer = () => {
                 className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors"
               >
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors"
-              >
-                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
