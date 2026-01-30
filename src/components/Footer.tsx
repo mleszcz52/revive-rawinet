@@ -68,21 +68,27 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold mb-6">Kontakt</h4>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+48123456789" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
+                <a href="tel:+48505051376" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
                   <Phone className="w-4 h-4" />
-                  <span>+48 123 456 789</span>
+                  <span>505 051 376</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:kontakt@rawinet.pl" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
+                <a href="tel:+48605934593" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Phone className="w-4 h-4" />
+                  <span>605 934 593</span>
+                </a>
+              </li>
+              <li>
+                <a href="mailto:biuro@rawinet.pl" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
                   <Mail className="w-4 h-4" />
-                  <span>kontakt@rawinet.pl</span>
+                  <span>biuro@rawinet.pl</span>
                 </a>
               </li>
               <li>
                 <div className="flex items-start gap-3 text-secondary-foreground/70">
                   <MapPin className="w-4 h-4 mt-1" />
-                  <span>ul. Przykładowa 123<br />00-000 Miasto</span>
+                  <span>ul. Mikołajewicza 8B/1<br />63-900 Rawicz</span>
                 </div>
               </li>
             </ul>
@@ -92,9 +98,13 @@ export const Footer = () => {
         {/* Divider */}
         <div className="h-px bg-white/10 my-10" />
 
-        {/* Copyright */}
+        {/* Company Info & Copyright */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-secondary-foreground/50">
-          <p>© 2025 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
+          <div className="text-center md:text-left">
+            <p className="font-medium text-secondary-foreground/70">Rawi-Net Sp. z o.o.</p>
+            <p>NIP: 699-194-79-84 | REGON: 301729188</p>
+            <p className="mt-1">© 2025 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
+          </div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-primary transition-colors">Polityka prywatności</a>
             <a href="#" className="hover:text-primary transition-colors">Regulamin</a>
