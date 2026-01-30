@@ -1,7 +1,8 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ClientPanel } from "@/components/ClientPanel";
-import { HelpCircle, Phone, Mail, MessageSquare } from "lucide-react";
+import { SpeedTestSection } from "@/components/SpeedTestSection";
+import { HelpCircle, Phone, Mail } from "lucide-react";
 
 const faqItems = [
   {
@@ -43,6 +44,9 @@ const Subscriber = () => {
             </div>
           </div>
         </section>
+
+        {/* Speed Test Section */}
+        <SpeedTestSection />
 
         {/* Client Panel */}
         <section className="py-16 lg:py-24">
