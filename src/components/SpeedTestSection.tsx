@@ -39,7 +39,7 @@ export const SpeedTestSection = () => {
             </h3>
             <div className="w-full mx-auto rounded-lg overflow-hidden" style={{ height: '550px' }}>
               <iframe
-                src="https://openspeedtest.com/speedtest?Theme=Light"
+                src="https://openspeedtest.com/speedtest?themeColor=ffffff"
                 className="w-full h-full border-0"
                 title="Test prędkości internetu OpenSpeedTest"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
