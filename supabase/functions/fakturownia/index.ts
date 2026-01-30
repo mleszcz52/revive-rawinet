@@ -649,7 +649,7 @@ serve(async (req) => {
     }
 
     if (action === 'getAllClients') {
-      // Get all clients from Fakturownia
+      // Get ALL clients from Fakturownia (with pagination)
       if (!FAKTUROWNIA_API_TOKEN || !FAKTUROWNIA_DOMAIN) {
         return new Response(
           JSON.stringify({ error: 'Fakturownia credentials not configured' }),
@@ -664,20 +664,46 @@ serve(async (req) => {
       const baseUrl = `https://${domain}`;
       const apiTokenParam = encodeURIComponent(FAKTUROWNIA_API_TOKEN);
 
-      const page = body.page || 1;
-      const url = `${baseUrl}/clients.json?api_token=${apiTokenParam}&page=${page}&per_page=50`;
+      // Fetch all pages of clients
+      let allClients: Array<{ email: string; id: number; name: string }> = [];
+      let page = 1;
+      const perPage = 100; // Maximum per page
       
-      const response = await fetch(url, { 
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+      while (true) {
+        const url = `${baseUrl}/clients.json?api_token=${apiTokenParam}&page=${page}&per_page=${perPage}`;
+        
+        const response = await fetch(url, { 
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        const pageData = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
+        
+        if (!pageData || pageData.length === 0) {
+          break; // No more clients
         }
-      });
-      
-      const data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
+        
+        allClients = allClients.concat(pageData);
+        
+        if (pageData.length < perPage) {
+          break; // Last page (not full)
+        }
+        
+        page++;
+        
+        // Safety limit to prevent infinite loops
+        if (page > 100) {
+          console.warn('Reached maximum page limit (100) for clients');
+          break;
+        }
+      }
+
+      console.log(`Fetched ${allClients.length} clients from Fakturownia (${page} pages)`);
 
       // Get credential status from database
-      const emails = data.map((c: { email: string }) => c.email?.toLowerCase()).filter(Boolean);
+      const emails = allClients.map((c) => c.email?.toLowerCase()).filter(Boolean);
       const { data: credentials } = await supabaseAdmin
         .from('client_credentials')
         .select('email, must_change_password, failed_attempts, locked_until, last_login')
@@ -685,7 +711,7 @@ serve(async (req) => {
 
       const credMap = new Map(credentials?.map(c => [c.email, c]) || []);
 
-      const clientsWithStatus = data.map((client: { email: string; id: number; name: string }) => ({
+      const clientsWithStatus = allClients.map((client) => ({
         ...client,
         hasCredentials: credMap.has(client.email?.toLowerCase()),
         credentialStatus: credMap.get(client.email?.toLowerCase()) || null
