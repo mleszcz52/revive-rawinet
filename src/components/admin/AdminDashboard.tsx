@@ -602,30 +602,39 @@ export const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {clientInvoices.map((invoice) => {
-                    const isPaid = invoice.status === "paid" || invoice.paid === invoice.price_gross;
-                    return (
-                      <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.number}</TableCell>
-                        <TableCell>{invoice.issue_date}</TableCell>
-                        <TableCell>{invoice.payment_to}</TableCell>
-                        <TableCell>{parseFloat(invoice.price_gross).toFixed(2)} zł</TableCell>
-                        <TableCell>
-                          {isPaid ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
-                              <CheckCircle className="w-3 h-3" />
-                              Opłacona
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 text-xs font-medium">
-                              <Clock className="w-3 h-3" />
-                              Nieopłacona
-                            </span>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {clientInvoices
+                    .filter((invoice) => {
+                      const isPaid = invoice.status === "paid" || invoice.paid === invoice.price_gross;
+                      if (isPaid) return true; // Opłacone - pokazuj wszystkie
+                      // Nieopłacone - tylko z bieżącego roku
+                      const currentYear = new Date().getFullYear();
+                      const invoiceYear = new Date(invoice.issue_date).getFullYear();
+                      return invoiceYear === currentYear;
+                    })
+                    .map((invoice) => {
+                      const isPaid = invoice.status === "paid" || invoice.paid === invoice.price_gross;
+                      return (
+                        <TableRow key={invoice.id}>
+                          <TableCell className="font-medium">{invoice.number}</TableCell>
+                          <TableCell>{invoice.issue_date}</TableCell>
+                          <TableCell>{invoice.payment_to}</TableCell>
+                          <TableCell>{parseFloat(invoice.price_gross).toFixed(2)} zł</TableCell>
+                          <TableCell>
+                            {isPaid ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+                                <CheckCircle className="w-3 h-3" />
+                                Opłacona
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 text-amber-600 text-xs font-medium">
+                                <Clock className="w-3 h-3" />
+                                Nieopłacona
+                              </span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             )}
