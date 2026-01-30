@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import logoRawinet from "@/assets/logo-rawinet.png";
 
 const navItems = [
-  { label: "Nowości", href: "/nowosci" },
   { label: "Internet", href: "/internet" },
   { label: "Telewizja", href: "/telewizja" },
   { label: "Internet+Telewizja", href: "/internet-telewizja" },
