@@ -35,13 +35,13 @@ export const SpeedTestSection = () => {
           {/* Speed Test Embed */}
           <div className="bg-card rounded-xl border border-border p-6 mb-12">
             <h3 className="text-xl font-semibold text-foreground mb-4 text-center">
-              Test prędkości OpenSpeedTest
+              Test prędkości LibreSpeed
             </h3>
-            <div className="w-full mx-auto rounded-lg overflow-hidden" style={{ height: '550px' }}>
+            <div className="w-full mx-auto rounded-lg overflow-hidden" style={{ height: '500px' }}>
               <iframe
-                src="https://openspeedtest.com/speedtest?themeColor=ffffff"
+                src="https://librespeed.org/"
                 className="w-full h-full border-0"
-                title="Test prędkości internetu OpenSpeedTest"
+                title="Test prędkości internetu LibreSpeed"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
               />
             </div>
