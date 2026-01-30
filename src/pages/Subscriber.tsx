@@ -45,15 +45,15 @@ const Subscriber = () => {
           </div>
         </section>
 
-        {/* Speed Test Section */}
-        <SpeedTestSection />
-
-        {/* Client Panel */}
+        {/* Client Panel - at the top */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
             <ClientPanel />
           </div>
         </section>
+
+        {/* Speed Test Section */}
+        <SpeedTestSection />
 
         {/* FAQ Section */}
         <section className="py-16 lg:py-24 bg-muted/30">
