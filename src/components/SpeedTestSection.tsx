@@ -35,13 +35,13 @@ export const SpeedTestSection = () => {
           {/* Speed Test Embed */}
           <div className="bg-card rounded-xl border border-border p-6 mb-12">
             <h3 className="text-xl font-semibold text-foreground mb-4 text-center">
-              Test prędkości Meter.net
+              Test prędkości Fireprobe
             </h3>
             <div className="w-full mx-auto rounded-lg overflow-hidden" style={{ height: '500px' }}>
               <iframe
-                src="https://www.meter.net/ping-test/"
+                src="https://demo.fireprobe.net/?lang=pl&theme=light"
                 className="w-full h-full border-0"
-                title="Test prędkości internetu Meter.net"
+                title="Test prędkości internetu Fireprobe"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
               />
             </div>
