@@ -1,5 +1,6 @@
 import { ArrowRight, Zap, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const features = [
   { icon: Zap, label: "Do 1 Gbps" },
@@ -51,13 +52,15 @@ export const Hero = () => {
               Sprawdź dostępność
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg backdrop-blur-sm"
-            >
-              Zobacz ofertę
-            </Button>
+            <Link to="/internet">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white/30 bg-white/10 text-white hover:bg-white/20 px-8 py-6 text-lg backdrop-blur-sm"
+              >
+                Zobacz ofertę
+              </Button>
+            </Link>
           </div>
 
           {/* Feature Pills */}
