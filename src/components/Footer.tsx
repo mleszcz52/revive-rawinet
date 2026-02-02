@@ -1,32 +1,21 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook } from "lucide-react";
 import logoRawinet from "@/assets/logo-rawinet.png";
-
 export const Footer = () => {
-  return (
-    <footer id="kontakt" className="bg-secondary text-secondary-foreground">
+  return <footer id="kontakt" className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 lg:px-8 py-16 lg:py-20">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="inline-block mb-6">
-              <img 
-                src={logoRawinet} 
-                alt="Rawinet - Internet Telewizja" 
-                className="h-12 w-auto"
-              />
+              <img src={logoRawinet} alt="Rawinet - Internet Telewizja" className="h-12 w-auto" />
             </Link>
             <p className="text-secondary-foreground/70 max-w-md mb-6">
               Lokalny dostawca internetu światłowodowego i telewizji. 
               Oferujemy szybkie, stabilne łącze i profesjonalne wsparcie techniczne.
             </p>
             <div className="flex gap-3">
-              <a 
-                href="https://www.facebook.com/p/Rawi-Net-niezawodny-światłowód-100077080039545/" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors"
-              >
+              <a href="https://www.facebook.com/p/Rawi-Net-niezawodny-światłowód-100077080039545/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/10 hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
@@ -99,7 +88,7 @@ export const Footer = () => {
           <div className="text-center md:text-left">
             <p className="font-medium text-secondary-foreground/70">Rawi-Net Sp. z o.o.</p>
             <p>NIP: 699-194-79-84 | REGON: 301729188</p>
-            <p className="mt-1">© 2025 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
+            <p className="mt-1">© 2026 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
           </div>
           <div className="flex gap-6">
             <a href="#" className="hover:text-primary transition-colors">Polityka prywatności</a>
@@ -107,6 +96,5 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
