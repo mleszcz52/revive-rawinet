@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, Search, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AvailabilityMapProps {
   className?: string;
@@ -14,9 +21,24 @@ interface AvailabilityMapProps {
 // Line segment type (array of points)
 type LineSegment = L.LatLng[];
 
+// Cities in the Rawicz area
+const CITIES = [
+  { value: "rawicz", label: "Rawicz" },
+  { value: "sierakowo", label: "Sierakowo" },
+  { value: "sarnowa", label: "Sarnowa" },
+  { value: "zawady", label: "Zawady" },
+  { value: "zielona-wies", label: "Zielona Wieś" },
+  { value: "izdebno", label: "Izdebno" },
+  { value: "szymanowo", label: "Szymanowo" },
+  { value: "masłowo", label: "Masłowo" },
+  { value: "dabrowka", label: "Dąbrówka" },
+  { value: "folwark", label: "Folwark" },
+];
+
 export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [availabilityResult, setAvailabilityResult] = useState<{
@@ -136,14 +158,16 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   };
 
   const checkAvailability = async () => {
-    if (!address.trim()) return;
+    if (!address.trim() || !city) return;
     
     setIsChecking(true);
     setAvailabilityResult(null);
     
     try {
+      // Get city label for search
+      const cityLabel = CITIES.find(c => c.value === city)?.label || city;
       // Use Nominatim for geocoding (free, no API key needed)
-      const searchQuery = `${address}, powiat rawicki, Polska`;
+      const searchQuery = `${address}, ${cityLabel}, powiat rawicki, Polska`;
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
       );
@@ -236,11 +260,27 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="address" className="text-foreground">Adres</Label>
+                <Label htmlFor="city" className="text-foreground">Miejscowość</Label>
+                <Select value={city} onValueChange={setCity}>
+                  <SelectTrigger id="city" className="mt-1.5">
+                    <SelectValue placeholder="Wybierz miejscowość" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CITIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="address" className="text-foreground">Ulica i numer</Label>
                 <Input
                   id="address"
                   type="text"
-                  placeholder="np. ul. Rynek 5, Rawicz"
+                  placeholder="np. ul. Rynek 5"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && checkAvailability()}
@@ -250,7 +290,7 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
               <Button
                 onClick={checkAvailability}
-                disabled={isChecking || !address.trim()}
+                disabled={isChecking || !address.trim() || !city}
                 className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
               >
                 {isChecking ? (
