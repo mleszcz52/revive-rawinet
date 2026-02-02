@@ -11,19 +11,21 @@ interface AvailabilityMapProps {
   className?: string;
 }
 
+// Line segment type (array of points)
+type LineSegment = L.LatLng[];
+
 export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
-  const coverageLayerRef = useRef<L.LayerGroup | null>(null);
   const [address, setAddress] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [availabilityResult, setAvailabilityResult] = useState<{
     available: boolean;
     message: string;
   } | null>(null);
-  const [polygons, setPolygons] = useState<L.LatLng[][]>([]);
+  const [networkLines, setNetworkLines] = useState<LineSegment[]>([]);
 
-  // Parse KMZ file and extract polygons
+  // Parse KMZ file and extract line segments
   useEffect(() => {
     const loadKMZ = async () => {
       try {
@@ -39,10 +41,10 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         const parser = new DOMParser();
         const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
         
-        // Extract all coordinates from polygons and lines
-        const extractedPolygons: L.LatLng[][] = [];
+        // Extract all coordinates from lines and polygons
+        const extractedLines: LineSegment[] = [];
         
-        // Get Polygon coordinates
+        // Get all coordinate elements
         const coordinates = kmlDoc.querySelectorAll("coordinates");
         coordinates.forEach(coord => {
           const coordText = coord.textContent?.trim();
@@ -52,13 +54,14 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
               return L.latLng(lat, lng);
             }).filter(p => !isNaN(p.lat) && !isNaN(p.lng));
             
-            if (points.length > 2) {
-              extractedPolygons.push(points);
+            // Store lines with at least 2 points
+            if (points.length >= 2) {
+              extractedLines.push(points);
             }
           }
         });
         
-        setPolygons(extractedPolygons);
+        setNetworkLines(extractedLines);
       } catch (error) {
         console.error("Error loading KMZ:", error);
       }
@@ -72,14 +75,12 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
     // Center on Rawicz area
-    const map = L.map(mapRef.current).setView([51.6095, 16.8581], 12);
+    const map = L.map(mapRef.current).setView([51.6095, 16.8581], 13);
     
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    const coverageLayer = L.layerGroup().addTo(map);
-    coverageLayerRef.current = coverageLayer;
     mapInstanceRef.current = map;
 
     return () => {
@@ -88,44 +89,50 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
     };
   }, []);
 
-  // Add polygons to map when loaded
-  useEffect(() => {
-    if (!coverageLayerRef.current || polygons.length === 0) return;
-    
-    coverageLayerRef.current.clearLayers();
-    
-    polygons.forEach(coords => {
-      L.polygon(coords, {
-        color: "#10b981",
-        fillColor: "#10b981",
-        fillOpacity: 0.3,
-        weight: 2,
-      }).addTo(coverageLayerRef.current!);
-    });
+  // Calculate distance from point to line segment in meters
+  const distanceToLineSegment = (point: L.LatLng, lineStart: L.LatLng, lineEnd: L.LatLng): number => {
+    const A = point.lat - lineStart.lat;
+    const B = point.lng - lineStart.lng;
+    const C = lineEnd.lat - lineStart.lat;
+    const D = lineEnd.lng - lineStart.lng;
 
-    // Fit bounds to show all polygons
-    if (mapInstanceRef.current && polygons.length > 0) {
-      const allPoints = polygons.flat();
-      if (allPoints.length > 0) {
-        const bounds = L.latLngBounds(allPoints);
-        mapInstanceRef.current.fitBounds(bounds, { padding: [20, 20] });
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+    
+    if (lenSq !== 0) {
+      param = dot / lenSq;
+    }
+
+    let closestLat: number;
+    let closestLng: number;
+
+    if (param < 0) {
+      closestLat = lineStart.lat;
+      closestLng = lineStart.lng;
+    } else if (param > 1) {
+      closestLat = lineEnd.lat;
+      closestLng = lineEnd.lng;
+    } else {
+      closestLat = lineStart.lat + param * C;
+      closestLng = lineStart.lng + param * D;
+    }
+
+    const closestPoint = L.latLng(closestLat, closestLng);
+    return point.distanceTo(closestPoint);
+  };
+
+  // Check if point is near any network line
+  const isPointNearNetwork = (point: L.LatLng, maxDistanceMeters: number = 50): boolean => {
+    for (const line of networkLines) {
+      for (let i = 0; i < line.length - 1; i++) {
+        const distance = distanceToLineSegment(point, line[i], line[i + 1]);
+        if (distance <= maxDistanceMeters) {
+          return true;
+        }
       }
     }
-  }, [polygons]);
-
-  // Check if point is inside any polygon
-  const isPointInPolygon = (point: L.LatLng, polygon: L.LatLng[]): boolean => {
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i].lng, yi = polygon[i].lat;
-      const xj = polygon[j].lng, yj = polygon[j].lat;
-      
-      if (((yi > point.lat) !== (yj > point.lat)) &&
-          (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi)) {
-        inside = !inside;
-      }
-    }
-    return inside;
+    return false;
   };
 
   const checkAvailability = async () => {
@@ -165,17 +172,17 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         L.marker(point, {
           icon: L.divIcon({
             className: "custom-marker",
-            html: `<div style="background: #ef4444; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>`,
+            html: `<div style="background: hsl(var(--primary)); width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>`,
             iconSize: [24, 24],
             iconAnchor: [12, 12],
           }),
         }).addTo(mapInstanceRef.current);
         
-        mapInstanceRef.current.setView(point, 15);
+        mapInstanceRef.current.setView(point, 16);
       }
       
-      // Check if point is in any coverage area
-      const isInCoverage = polygons.some(polygon => isPointInPolygon(point, polygon));
+      // Check if point is near any network line (within 50 meters)
+      const isInCoverage = isPointNearNetwork(point, 50);
       
       if (isInCoverage) {
         setAvailabilityResult({
@@ -299,9 +306,9 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
             {/* Coverage info */}
             <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-sm text-muted-foreground">
-                <span className="inline-block w-3 h-3 rounded bg-green-500/50 mr-2"></span>
-                Obszary zaznaczone na zielono to miejsca objęte zasięgiem sieci RawiNet.
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Sprawdzamy dostępność na podstawie infrastruktury sieci RawiNet.
               </p>
             </div>
           </div>
