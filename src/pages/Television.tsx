@@ -4,6 +4,7 @@ import { JamboxChannels } from "@/components/JamboxChannels";
 import { Check, Tv, Film, Monitor, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import tvSmartDecoder from "@/assets/tv-smart-decoder.jpg";
 
 const tvPackages = [
   {
@@ -87,39 +88,53 @@ const Television = () => {
         </section>
 
         {/* TV Smart Banner */}
-        <section className="py-10 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"></div>
+        <section className="py-12 lg:py-16 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
           <div className="container mx-auto px-4 lg:px-8 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
-                <div className="flex-shrink-0">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/20">
-                    <Monitor className="w-10 h-10 text-primary" />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-white">tv</span>
-                    <span className="text-2xl font-bold text-primary">smart</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Dekoder 4K z Android TV</h3>
-                  <p className="text-white/70 max-w-md">
-                    Łączy tradycyjną telewizję z dostępem do Netflix, HBO Max, Disney+, YouTube i innych serwisów streamingowych.
-                  </p>
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              {/* Left - Image */}
+              <div className="order-2 lg:order-1 flex justify-center lg:justify-start">
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-primary/10 rounded-3xl blur-2xl"></div>
+                  <img 
+                    src={tvSmartDecoder} 
+                    alt="TV Smart - dekoder 4K z Android TV" 
+                    className="relative w-full max-w-md lg:max-w-lg object-contain drop-shadow-2xl"
+                  />
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <a href="https://www.jambox.pl/tvsmart" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                    Więcej informacji
-                  </Button>
-                </a>
-                <a href="tel:505051376">
-                  <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Zamów teraz
-                  </Button>
-                </a>
+              
+              {/* Right - Content */}
+              <div className="order-1 lg:order-2 text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-4">
+                  <span className="text-3xl lg:text-4xl font-bold text-white">tv</span>
+                  <span className="text-3xl lg:text-4xl font-bold text-primary">smart</span>
+                </div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                  Dekoder 4K z Android TV
+                </h3>
+                <p className="text-lg text-white/70 mb-6 max-w-lg mx-auto lg:mx-0">
+                  Łączy tradycyjną telewizję z dostępem do Netflix, HBO Max, Disney+, YouTube i innych serwisów streamingowych. Wszystko w jednym urządzeniu!
+                </p>
+                <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">Android TV</span>
+                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">4K Ultra HD</span>
+                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">VOD</span>
+                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">Streaming</span>
+                </div>
+                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                  <a href="https://www.jambox.pl/tvsmart" target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+                      Więcej informacji
+                    </Button>
+                  </a>
+                  <a href="tel:505051376">
+                    <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow w-full sm:w-auto">
+                      <Phone className="w-4 h-4 mr-2" />
+                      Zamów teraz
+                    </Button>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
