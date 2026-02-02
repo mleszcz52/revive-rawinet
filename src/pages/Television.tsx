@@ -124,7 +124,7 @@ const Television = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                   <a href="https://www.jambox.pl/tvsmart" target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
+                    <Button variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 w-full sm:w-auto font-semibold">
                       Więcej informacji
                     </Button>
                   </a>
