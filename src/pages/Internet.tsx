@@ -65,7 +65,7 @@ const Internet = () => {
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
-                    505 051 376 (Biuro, 8-16)
+                    505 051 376 (Biuro)
                   </Button>
                 </a>
                 <a href="tel:605934593">

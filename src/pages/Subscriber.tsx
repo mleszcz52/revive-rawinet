@@ -105,7 +105,7 @@ const Subscriber = () => {
                 <Phone className="w-8 h-8 text-primary mb-3" />
                 <span className="font-semibold text-foreground">Biuro</span>
                 <span className="text-sm text-muted-foreground">505 051 376</span>
-                <span className="text-xs text-muted-foreground/70">pon-pt 8-16</span>
+                <span className="text-xs text-muted-foreground/70">pon-pt</span>
               </a>
               <a
                 href="tel:605934593"
