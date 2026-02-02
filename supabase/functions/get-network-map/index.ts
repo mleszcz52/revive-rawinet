@@ -1,12 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Simple token to prevent direct access (not bulletproof, but adds a layer)
-const ACCESS_TOKEN = "rn_map_2024_secure";
 
 serve(async (req) => {
   // Handle CORS preflight
@@ -15,47 +13,35 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const token = url.searchParams.get('token');
+    // Create Supabase client with service role (to bypass RLS on storage)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Simple token validation
-    if (token !== ACCESS_TOKEN) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
+    // Download file from private storage bucket
+    const { data, error } = await supabase.storage
+      .from('maps')
+      .download('Schemat.kmz');
 
-    // Fetch the KMZ file from the public URL
-    // In production, this could be stored in Supabase Storage with private access
-    const kmzUrl = Deno.env.get('SUPABASE_URL')?.replace('/rest/v1', '') + '/storage/v1/object/public/maps/Schemat.kmz';
-    
-    // For now, we'll serve a base64 encoded version or you can upload to storage
-    // This is a placeholder - you'll need to upload the KMZ to Supabase Storage
-    
-    // Alternative: Read from a publicly hosted but obscured location
-    const response = await fetch('https://cqbwkhhefnurmddwazsk.supabase.co/storage/v1/object/public/maps/Schemat.kmz');
-    
-    if (!response.ok) {
-      // Fallback to the original public path for now
+    if (error) {
+      console.error('Storage error:', error);
+      // Return fallback flag so client can use public file
       return new Response(
         JSON.stringify({ 
-          error: 'Map file not found in storage. Please upload Schemat.kmz to Supabase Storage bucket "maps".',
+          error: 'Map file not found in storage',
           fallback: true 
         }),
         { 
-          status: 404, 
+          status: 200, // Return 200 so client handles fallback
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
     }
 
-    const kmzData = await response.arrayBuffer();
+    const arrayBuffer = await data.arrayBuffer();
 
-    return new Response(kmzData, {
+    return new Response(arrayBuffer, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/vnd.google-earth.kmz',
@@ -65,9 +51,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error serving map:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', fallback: true }),
       { 
-        status: 500, 
+        status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );
