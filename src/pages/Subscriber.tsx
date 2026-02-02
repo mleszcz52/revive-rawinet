@@ -19,7 +19,7 @@ const faqItems = [
   },
   {
     question: "Jak skonfigurować router?",
-    answer: "Instrukcje konfiguracji routera znajdziesz w dokumentacji dołączonej do urządzenia. W razie problemów zadzwoń do nas.",
+    answer: "Zaloguj się do panelu klienta powyżej, używając adresu email podanego podczas podpisywania umowy.",
   },
 ];
 
