@@ -21,18 +21,15 @@ interface AvailabilityMapProps {
 // Line segment type (array of points)
 type LineSegment = L.LatLng[];
 
-// Cities in the Rawicz area
+// Cities in the coverage area
 const CITIES = [
   { value: "rawicz", label: "Rawicz" },
-  { value: "sierakowo", label: "Sierakowo" },
   { value: "sarnowa", label: "Sarnowa" },
-  { value: "zawady", label: "Zawady" },
-  { value: "zielona-wies", label: "Zielona Wieś" },
-  { value: "izdebno", label: "Izdebno" },
-  { value: "szymanowo", label: "Szymanowo" },
-  { value: "masłowo", label: "Masłowo" },
-  { value: "dabrowka", label: "Dąbrówka" },
-  { value: "folwark", label: "Folwark" },
+  { value: "miejska-gorka", label: "Miejska Górka" },
+  { value: "piaski", label: "Piaski" },
+  { value: "wroclaw", label: "Wrocław" },
+  { value: "konary", label: "Konary" },
+  { value: "bojanowo", label: "Bojanowo" },
 ];
 
 export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
