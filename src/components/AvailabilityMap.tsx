@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, Search, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -48,8 +49,23 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   useEffect(() => {
     const loadKMZ = async () => {
       try {
-        const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
-        const arrayBuffer = await response.arrayBuffer();
+        // Try to load via edge function first (more secure)
+        const { data, error } = await supabase.functions.invoke('get-network-map', {
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        let arrayBuffer: ArrayBuffer;
+
+        if (error || (data && data.fallback)) {
+          // Fallback to public file if edge function fails
+          console.log('Using fallback public map file');
+          const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
+          arrayBuffer = await response.arrayBuffer();
+        } else {
+          // Edge function returned the file
+          arrayBuffer = data;
+        }
+        
         const zip = await JSZip.loadAsync(arrayBuffer);
         
         // Find KML file in the archive
@@ -83,6 +99,39 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         setNetworkLines(extractedLines);
       } catch (error) {
         console.error("Error loading KMZ:", error);
+        // Try fallback to public file
+        try {
+          const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
+          const arrayBuffer = await response.arrayBuffer();
+          const zip = await JSZip.loadAsync(arrayBuffer);
+          
+          const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
+          if (!kmlFile) return;
+          
+          const kmlContent = await zip.files[kmlFile].async("text");
+          const parser = new DOMParser();
+          const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
+          
+          const extractedLines: LineSegment[] = [];
+          const coordinates = kmlDoc.querySelectorAll("coordinates");
+          coordinates.forEach(coord => {
+            const coordText = coord.textContent?.trim();
+            if (coordText) {
+              const points = coordText.split(/\s+/).map(point => {
+                const [lng, lat] = point.split(",").map(Number);
+                return L.latLng(lat, lng);
+              }).filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+              
+              if (points.length >= 2) {
+                extractedLines.push(points);
+              }
+            }
+          });
+          
+          setNetworkLines(extractedLines);
+        } catch (fallbackError) {
+          console.error("Fallback also failed:", fallbackError);
+        }
       }
     };
     
