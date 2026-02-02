@@ -808,10 +808,17 @@ serve(async (req) => {
         break;
 
       case 'getClientInvoices':
-        // Get all invoices for a client
+        // Get all invoices for a client (filtered from 2026 for subscribers)
         url = `${baseUrl}/invoices.json?api_token=${apiTokenParam}&client_id=${clientId}`;
         response = await fetch(url, { headers });
-        data = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
+        const allInvoices = await safeJsonParse(response, url.replace(apiTokenParam, '***'));
+        // Filter invoices to show only from 2026 onwards for subscribers
+        data = allInvoices.filter((invoice: { issue_date?: string; sell_date?: string }) => {
+          const invoiceDate = invoice.issue_date || invoice.sell_date;
+          if (!invoiceDate) return false;
+          const year = new Date(invoiceDate).getFullYear();
+          return year >= 2026;
+        });
         break;
 
       case 'getInvoice':

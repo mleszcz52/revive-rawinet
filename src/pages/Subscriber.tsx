@@ -103,15 +103,16 @@ const Subscriber = () => {
                 className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
               >
                 <Phone className="w-8 h-8 text-primary mb-3" />
-                <span className="font-semibold text-foreground">Telefon</span>
+                <span className="font-semibold text-foreground">Biuro</span>
                 <span className="text-sm text-muted-foreground">505 051 376</span>
+                <span className="text-xs text-muted-foreground/70">pon-pt 8-16</span>
               </a>
               <a
                 href="tel:605934593"
                 className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
               >
                 <Phone className="w-8 h-8 text-primary mb-3" />
-                <span className="font-semibold text-foreground">Telefon</span>
+                <span className="font-semibold text-foreground">Dział techniczny</span>
                 <span className="text-sm text-muted-foreground">605 934 593</span>
               </a>
               <a
