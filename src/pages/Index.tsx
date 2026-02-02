@@ -4,6 +4,7 @@ import { Hero } from "@/components/Hero";
 import { RouterOptions } from "@/components/RouterOptions";
 import { Features } from "@/components/Features";
 import { Footer } from "@/components/Footer";
+import { AvailabilityMap } from "@/components/AvailabilityMap";
 
 const Index = () => {
   return (
@@ -11,6 +12,7 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
+        <AvailabilityMap />
         <RouterOptions />
         <Features />
       </main>
