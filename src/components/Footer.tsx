@@ -51,11 +51,14 @@ export const Footer = () => {
           {/* Contact */}
           <div>
             <h4 className="text-lg font-semibold mb-6">Kontakt</h4>
+            <p className="text-sm text-secondary-foreground/60 mb-4 bg-white/5 rounded-lg px-3 py-2">
+              📅 pon-pt 8:00 - 16:00
+            </p>
             <ul className="space-y-4">
               <li>
               <a href="tel:+48505051376" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
                   <Phone className="w-4 h-4" />
-                  <span>505 051 376 <span className="text-secondary-foreground/50">(Biuro, 8-16)</span></span>
+                  <span>505 051 376 <span className="text-secondary-foreground/50">(Biuro)</span></span>
                 </a>
               </li>
               <li>
