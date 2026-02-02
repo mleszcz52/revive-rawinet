@@ -74,6 +74,12 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
+                <a href="mailto:dtech@rawinet.pl" className="flex items-center gap-3 text-secondary-foreground/70 hover:text-primary transition-colors">
+                  <Mail className="w-4 h-4" />
+                  <span>dtech@rawinet.pl <span className="text-secondary-foreground/50">(Dział techniczny)</span></span>
+                </a>
+              </li>
+              <li>
                 <div className="flex items-start gap-3 text-secondary-foreground/70">
                   <MapPin className="w-4 h-4 mt-1" />
                   <span>ul. Mikołajewicza 8B/1<br />63-900 Rawicz</span>
