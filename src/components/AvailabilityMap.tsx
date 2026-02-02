@@ -21,15 +21,15 @@ interface AvailabilityMapProps {
 // Line segment type (array of points)
 type LineSegment = L.LatLng[];
 
-// Cities in the coverage area
+// Cities in the coverage area with their region for geocoding
 const CITIES = [
-  { value: "rawicz", label: "Rawicz" },
-  { value: "sarnowa", label: "Sarnowa" },
-  { value: "miejska-gorka", label: "Miejska Górka" },
-  { value: "piaski", label: "Piaski" },
-  { value: "wroclaw", label: "Wrocław" },
-  { value: "konary", label: "Konary" },
-  { value: "bojanowo", label: "Bojanowo" },
+  { value: "rawicz", label: "Rawicz", region: "powiat rawicki, wielkopolskie" },
+  { value: "sarnowa", label: "Sarnowa", region: "powiat rawicki, wielkopolskie" },
+  { value: "miejska-gorka", label: "Miejska Górka", region: "powiat rawicki, wielkopolskie" },
+  { value: "piaski", label: "Piaski", region: "powiat rawicki, wielkopolskie" },
+  { value: "wroclaw", label: "Wrocław", region: "dolnośląskie" },
+  { value: "konary", label: "Konary", region: "powiat rawicki, wielkopolskie" },
+  { value: "bojanowo", label: "Bojanowo", region: "powiat rawicki, wielkopolskie" },
 ];
 
 export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
@@ -161,10 +161,12 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
     setAvailabilityResult(null);
     
     try {
-      // Get city label for search
-      const cityLabel = CITIES.find(c => c.value === city)?.label || city;
+      // Get city data for search
+      const cityData = CITIES.find(c => c.value === city);
+      const cityLabel = cityData?.label || city;
+      const region = cityData?.region || "";
       // Use Nominatim for geocoding (free, no API key needed)
-      const searchQuery = `${address}, ${cityLabel}, powiat rawicki, Polska`;
+      const searchQuery = `${address}, ${cityLabel}, ${region}, Polska`;
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
       );
