@@ -86,6 +86,29 @@ const Television = () => {
           </div>
         </section>
 
+        {/* Wektra Decoder Banner */}
+        <section className="py-8 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-center md:text-left">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Tv className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Dekodery TV Smart od Wektry</h3>
+                  <p className="text-sm text-muted-foreground">Zapewniamy nowoczesne dekodery Smart TV w zestawie z usługą</p>
+                </div>
+              </div>
+              <a href="tel:505051376">
+                <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  <Phone className="w-4 h-4 mr-2" />
+                  Dowiedz się więcej
+                </Button>
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* TV Packages */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
