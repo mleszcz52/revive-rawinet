@@ -142,21 +142,15 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   };
 
   // Check if point is near any network line
-  const isPointNearNetwork = (point: L.LatLng, maxDistanceMeters: number = 150): boolean => {
-    let minDistance = Infinity;
+  const isPointNearNetwork = (point: L.LatLng, maxDistanceMeters: number = 50): boolean => {
     for (const line of networkLines) {
       for (let i = 0; i < line.length - 1; i++) {
         const distance = distanceToLineSegment(point, line[i], line[i + 1]);
-        if (distance < minDistance) {
-          minDistance = distance;
-        }
         if (distance <= maxDistanceMeters) {
-          console.log(`Znaleziono linię w odległości ${distance.toFixed(1)}m od punktu`);
           return true;
         }
       }
     }
-    console.log(`Najbliższa linia w odległości ${minDistance.toFixed(1)}m (max: ${maxDistanceMeters}m)`);
     return false;
   };
 
@@ -186,9 +180,8 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         return;
       }
       
-      const { lat, lon, display_name } = data[0];
+      const { lat, lon } = data[0];
       const point = L.latLng(parseFloat(lat), parseFloat(lon));
-      console.log(`Geokodowanie: "${searchQuery}" -> ${display_name} (${lat}, ${lon})`);
       
       // Add marker to map
       if (mapInstanceRef.current) {
@@ -211,8 +204,8 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         mapInstanceRef.current.setView(point, 16);
       }
       
-      // Check if point is near any network line (within 150 meters)
-      const isInCoverage = isPointNearNetwork(point, 150);
+      // Check if point is near any network line (within 50 meters)
+      const isInCoverage = isPointNearNetwork(point, 50);
       
       if (isInCoverage) {
         setAvailabilityResult({
