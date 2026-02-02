@@ -335,7 +335,7 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
                   {availabilityResult.available && (
                     <a href="tel:505051376" className="block mt-4">
                       <Button className="w-full gradient-primary text-primary-foreground">
-                        Zamów teraz: 505 051 376
+                        Zamów teraz: 505 051 376 (Biuro, 8-16)
                       </Button>
                     </a>
                   )}
@@ -348,7 +348,7 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
               <p className="text-sm text-muted-foreground flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                 <span>
-                  To jest <strong>zasięg teoretyczny</strong>. Do ostatecznego potwierdzenia dostępności usługi zadzwoń: <a href="tel:505051376" className="text-primary font-medium hover:underline">505 051 376</a>
+                  To jest <strong>zasięg teoretyczny</strong>. Do ostatecznego potwierdzenia dostępności usługi zadzwoń: <a href="tel:505051376" className="text-primary font-medium hover:underline">505 051 376</a> (Biuro, 8-16)
                 </span>
               </p>
             </div>

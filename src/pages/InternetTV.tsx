@@ -66,13 +66,13 @@ const InternetTV = () => {
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
-                    505 051 376
+                    505 051 376 (Biuro, 8-16)
                   </Button>
                 </a>
                 <a href="tel:605934593">
                   <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
                     <Phone className="w-5 h-5 mr-2" />
-                    605 934 593
+                    605 934 593 (Dział techniczny)
                   </Button>
                 </a>
               </div>
