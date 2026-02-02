@@ -116,12 +116,20 @@ const Subscriber = () => {
                 <span className="text-sm text-muted-foreground">605 934 593</span>
               </a>
               <a
-                href="mailto:kontakt@rawinet.pl"
+                href="mailto:biuro@rawinet.pl"
                 className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
               >
                 <Mail className="w-8 h-8 text-primary mb-3" />
                 <span className="font-semibold text-foreground">Email</span>
-                <span className="text-sm text-muted-foreground">kontakt@rawinet.pl</span>
+                <span className="text-sm text-muted-foreground">biuro@rawinet.pl</span>
+              </a>
+              <a
+                href="mailto:dtech@rawinet.pl"
+                className="flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-card-hover transition-all"
+              >
+                <Mail className="w-8 h-8 text-primary mb-3" />
+                <span className="font-semibold text-foreground">Dział techniczny</span>
+                <span className="text-sm text-muted-foreground">dtech@rawinet.pl</span>
               </a>
             </div>
           </div>
