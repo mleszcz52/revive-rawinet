@@ -86,25 +86,41 @@ const Television = () => {
           </div>
         </section>
 
-        {/* Wektra Decoder Banner */}
-        <section className="py-8 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-center md:text-left">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Tv className="w-6 h-6 text-primary" />
+        {/* TV Smart Banner */}
+        <section className="py-10 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent"></div>
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/20">
+                    <Monitor className="w-10 h-10 text-primary" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-foreground">Dekodery TV Smart od Wektry</h3>
-                  <p className="text-sm text-muted-foreground">Zapewniamy nowoczesne dekodery Smart TV w zestawie z usługą</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl font-bold text-white">tv</span>
+                    <span className="text-2xl font-bold text-primary">smart</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Dekoder 4K z Android TV</h3>
+                  <p className="text-white/70 max-w-md">
+                    Łączy tradycyjną telewizję z dostępem do Netflix, HBO Max, Disney+, YouTube i innych serwisów streamingowych.
+                  </p>
                 </div>
               </div>
-              <a href="tel:505051376">
-                <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Dowiedz się więcej
-                </Button>
-              </a>
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <a href="https://www.jambox.pl/tvsmart" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10">
+                    Więcej informacji
+                  </Button>
+                </a>
+                <a href="tel:505051376">
+                  <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Zamów teraz
+                  </Button>
+                </a>
+              </div>
             </div>
           </div>
         </section>
