@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JamboxChannels } from "@/components/JamboxChannels";
-import { Check, Tv, Film, Monitor, Phone } from "lucide-react";
+import { Check, Tv, Film, Monitor, Phone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import tvSmartDecoder from "@/assets/tv-smart-decoder.jpg";
@@ -33,6 +33,60 @@ const tvPackages = [
     features: ["179 kanałów telewizyjnych", "152 kanały w jakości HD", "Telewizja JAMBOX", "Pełna oferta kanałów", "Pakiety tematyczne i premium"],
     popular: false,
     link: "/telewizja/bogaty",
+  },
+];
+
+const thematicPackages = [
+  {
+    name: "Więcej Sportu PLUS",
+    price: "24,99",
+    channels: ["Eurosport 2 HD", "Polsat Sport 2 HD", "Eleven Sports 2 HD", "Extreme Channel HD", "Polsat Sport 3 HD", "Fightklub HD"],
+    icon: "🏆",
+  },
+  {
+    name: "Więcej Erotyki",
+    price: "24,99",
+    channels: ["Adult Channel", "Blue Hustler", "Brazzers TV Europe HD", "Dorcel XXX HD", "Hustler TV", "Private TV HD"],
+    icon: "🔞",
+  },
+];
+
+const premiumPackages = [
+  {
+    name: "Pakiet Eleven",
+    price: "24,99",
+    channels: ["Eleven Sports 1 4K", "Eleven Sports 1 HD", "Eleven Sports 2 HD", "Eleven Sports 3 HD", "Eleven Sports 4 HD"],
+    icon: "⚽",
+  },
+  {
+    name: "Pakiet HBO + Max",
+    price: "29,99",
+    channels: ["HBO HD", "HBO2 HD", "HBO3 HD"],
+    icon: "🎬",
+  },
+  {
+    name: "Pakiet Cinemax",
+    price: "14,99",
+    channels: ["Cinemax HD", "Cinemax 2 HD"],
+    icon: "🎥",
+  },
+  {
+    name: "Pakiet Filmbox",
+    price: "14,99",
+    channels: ["FilmBox Extra HD", "FilmBox Premium HD", "FilmBox Family", "FilmBox Action", "Filmbox Arthouse"],
+    icon: "📽️",
+  },
+  {
+    name: "CANAL+ Select",
+    price: "62,99",
+    channels: ["CANAL+ 360 HD", "CANAL+ Premium HD", "CANAL+ 1 HD", "CANAL+ Film HD", "CANAL+ Seriale HD", "CANAL+ Dokument HD"],
+    icon: "📺",
+  },
+  {
+    name: "CANAL+ Prestige",
+    price: "68,99",
+    channels: ["CANAL+ 360 HD", "CANAL+ Premium HD", "CANAL+ Sport HD", "CANAL+ Sport 2-4 HD", "CANAL+ 4K Ultra HD", "+ więcej"],
+    icon: "👑",
   },
 ];
 
@@ -208,6 +262,92 @@ const Television = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Thematic Packages */}
+        <section className="py-16 lg:py-24">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                <Plus className="w-4 h-4 inline mr-1" />
+                Rozszerz swój pakiet
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                Pakiety <span className="text-gradient">tematyczne</span>
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Domów dodatkowe kanały w każdej chwili – szybko i łatwo!
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+              {thematicPackages.map((pkg) => (
+                <div
+                  key={pkg.name}
+                  className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{pkg.icon}</span>
+                      <h3 className="text-lg font-bold text-foreground">{pkg.name}</h3>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xl font-bold text-primary">{pkg.price}</span>
+                      <span className="text-sm text-muted-foreground"> zł/mies.</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {pkg.channels.map((channel, i) => (
+                      <span key={i} className="text-xs px-2 py-1 bg-muted rounded-md text-muted-foreground">
+                        {channel}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Premium Packages */}
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Pakiety <span className="text-gradient">Premium</span>
+              </h3>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {premiumPackages.map((pkg) => (
+                <div
+                  key={pkg.name}
+                  className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover hover:border-primary/30 transition-all"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">{pkg.icon}</span>
+                    <h3 className="text-lg font-bold text-foreground">{pkg.name}</h3>
+                  </div>
+                  <div className="mb-4">
+                    <span className="text-2xl font-bold text-primary">{pkg.price}</span>
+                    <span className="text-sm text-muted-foreground"> zł brutto/mies.</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {pkg.channels.map((channel, i) => (
+                      <span key={i} className="text-xs px-2 py-1 bg-muted rounded-md text-muted-foreground">
+                        {channel}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-10">
+              <a href="tel:505051376">
+                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  <Phone className="w-5 h-5 mr-2" />
+                  Zamów pakiet dodatkowy
+                </Button>
+              </a>
             </div>
           </div>
         </section>
