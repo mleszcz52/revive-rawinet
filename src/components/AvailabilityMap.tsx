@@ -305,10 +305,12 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
             </div>
 
             {/* Coverage info */}
-            <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                Sprawdzamy dostępność na podstawie infrastruktury sieci RawiNet.
+            <div className="mt-6 pt-6 border-t border-border space-y-2">
+              <p className="text-sm text-muted-foreground flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span>
+                  To jest <strong>zasięg teoretyczny</strong>. Do ostatecznego potwierdzenia dostępności usługi zadzwoń: <a href="tel:505051376" className="text-primary font-medium hover:underline">505 051 376</a>
+                </span>
               </p>
             </div>
           </div>
