@@ -48,7 +48,7 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   useEffect(() => {
     const loadKMZ = async () => {
       try {
-        const response = await fetch("/maps/Schemat.kmz");
+        const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
         const arrayBuffer = await response.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
         
