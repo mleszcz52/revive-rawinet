@@ -108,25 +108,25 @@ const Business = () => {
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5 shrink-0">
                       <Check className="w-3 h-3 text-green-500" />
                     </div>
                     <span className="text-muted-foreground">Gwarancja zachowania określonych parametrów pasma i braku overbookingu</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5 shrink-0">
                       <Check className="w-3 h-3 text-green-500" />
                     </div>
                     <span className="text-muted-foreground">Łącze dostępowe zakończone stykiem Ethernet</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5 shrink-0">
                       <Check className="w-3 h-3 text-green-500" />
                     </div>
                     <span className="text-muted-foreground">Szybkość transmisji dostosowywana do potrzeb - od 1 Mb/s</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5">
+                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center mt-0.5 shrink-0">
                       <Check className="w-3 h-3 text-green-500" />
                     </div>
                     <span className="text-muted-foreground">Pasmo symetryczne - identyczna i gwarantowana prędkość w obu kierunkach</span>
@@ -146,8 +146,8 @@ const Business = () => {
                 </p>
                 <ul className="space-y-3">
                   {useCases.map((useCase, index) => (
-                    <li key={index} className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="w-3 h-3 text-primary" />
                       </div>
                       <span className="text-foreground">{useCase}</span>
