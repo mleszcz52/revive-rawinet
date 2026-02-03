@@ -788,40 +788,50 @@ export const ClientPanel = () => {
                 {displayedInvoices.map((invoice) => (
                   <div
                     key={invoice.id}
-                    className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50"
+                    className="p-4 bg-muted/30 rounded-xl border border-border/50"
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="font-semibold text-foreground">{invoice.number}</span>
-                        {getStatusBadge(invoice.status)}
+                    {/* Mobile-first: stack vertically, then row on larger screens */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      {/* Invoice info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="font-semibold text-foreground">{invoice.number}</span>
+                          {getStatusBadge(invoice.status)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          <span className="block sm:inline">Wystawiona: {invoice.issue_date}</span>
+                          <span className="hidden sm:inline"> • </span>
+                          <span className="block sm:inline">Termin: {invoice.payment_to}</span>
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Wystawiona: {invoice.issue_date} • Termin: {invoice.payment_to}
+
+                      {/* Price and actions row on mobile */}
+                      <div className="flex items-center justify-between sm:justify-end gap-4">
+                        <div className="text-left sm:text-right">
+                          <p className="font-bold text-foreground">{invoice.price_gross} {invoice.currency}</p>
+                          <p className="text-sm text-muted-foreground">netto: {invoice.price_net} {invoice.currency}</p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          {invoice.status !== 'paid' && invoice.payment_url && (
+                            <Button
+                              size="sm"
+                              className="gradient-primary text-primary-foreground"
+                              onClick={() => window.open(invoice.payment_url!, '_blank')}
+                            >
+                              <CreditCard className="w-4 h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Zapłać</span>
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadInvoice(invoice.id)}
+                          >
+                            <Download className="w-4 h-4 sm:mr-1" />
+                            <span className="hidden sm:inline">PDF</span>
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right mr-4">
-                      <p className="font-bold text-foreground">{invoice.price_gross} {invoice.currency}</p>
-                      <p className="text-sm text-muted-foreground">netto: {invoice.price_net} {invoice.currency}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {invoice.status !== 'paid' && invoice.payment_url && (
-                        <Button
-                          size="sm"
-                          className="gradient-primary text-primary-foreground"
-                          onClick={() => window.open(invoice.payment_url!, '_blank')}
-                        >
-                          <CreditCard className="w-4 h-4 mr-1" />
-                          Zapłać
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => downloadInvoice(invoice.id)}
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        PDF
-                      </Button>
                     </div>
                   </div>
                 ))}
