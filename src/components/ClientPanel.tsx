@@ -709,30 +709,41 @@ export const ClientPanel = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
         <Button
           variant={activeTab === "info" ? "default" : "outline"}
           onClick={() => setActiveTab("info")}
-          className={activeTab === "info" ? "gradient-primary text-primary-foreground" : ""}
+          className={cn(
+            "shrink-0",
+            activeTab === "info" ? "gradient-primary text-primary-foreground" : ""
+          )}
         >
-          <User className="w-4 h-4 mr-2" />
-          Dane konta
+          <User className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">Dane konta</span>
         </Button>
         <Button
           variant={activeTab === "invoices" ? "default" : "outline"}
           onClick={() => setActiveTab("invoices")}
-          className={activeTab === "invoices" ? "gradient-primary text-primary-foreground" : ""}
+          className={cn(
+            "shrink-0",
+            activeTab === "invoices" ? "gradient-primary text-primary-foreground" : ""
+          )}
         >
-          <FileText className="w-4 h-4 mr-2" />
-          Faktury ({displayedInvoices.length})
+          <FileText className="w-4 h-4 sm:mr-2" />
+          <span className="sm:hidden">({displayedInvoices.length})</span>
+          <span className="hidden sm:inline">Faktury ({displayedInvoices.length})</span>
         </Button>
         <Button
           variant={activeTab === "payments" ? "default" : "outline"}
           onClick={() => setActiveTab("payments")}
-          className={activeTab === "payments" ? "gradient-primary text-primary-foreground" : ""}
+          className={cn(
+            "shrink-0",
+            activeTab === "payments" ? "gradient-primary text-primary-foreground" : ""
+          )}
         >
-          <CreditCard className="w-4 h-4 mr-2" />
-          Płatności ({payments.length})
+          <CreditCard className="w-4 h-4 sm:mr-2" />
+          <span className="sm:hidden">({payments.length})</span>
+          <span className="hidden sm:inline">Płatności ({payments.length})</span>
         </Button>
       </div>
 
