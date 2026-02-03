@@ -191,7 +191,8 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   };
 
   // Check if point is near any network line
-  const isPointNearNetwork = (point: L.LatLng, maxDistanceMeters: number = 50): boolean => {
+  // Reduced from 50m to 25m for more accurate coverage detection
+  const isPointNearNetwork = (point: L.LatLng, maxDistanceMeters: number = 25): boolean => {
     for (const line of networkLines) {
       for (let i = 0; i < line.length - 1; i++) {
         const distance = distanceToLineSegment(point, line[i], line[i + 1]);
@@ -253,13 +254,13 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
         mapInstanceRef.current.setView(point, 16);
       }
       
-      // Check if point is near any network line (within 50 meters)
-      const isInCoverage = isPointNearNetwork(point, 50);
+      // Check if point is near any network line (within 25 meters for more accurate detection)
+      const isInCoverage = isPointNearNetwork(point, 25);
       
       if (isInCoverage) {
         setAvailabilityResult({
           available: true,
-          message: "Świetna wiadomość! Twój adres jest w zasięgu sieci RawiNet. Skontaktuj się z nami, aby zamówić usługę.",
+          message: "Twój adres może być w zasięgu sieci RawiNet. Zadzwoń do nas, aby potwierdzić możliwość podłączenia.",
         });
       } else {
         setAvailabilityResult({
