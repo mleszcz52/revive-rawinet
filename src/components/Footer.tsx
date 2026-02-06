@@ -100,7 +100,7 @@ export const Footer = () => {
             <p className="mt-1">© 2026 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
           </div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-primary transition-colors">Polityka prywatności</a>
+            <Link to="/polityka-prywatnosci" className="hover:text-primary transition-colors">Polityka prywatności</Link>
             <a href="#" className="hover:text-primary transition-colors">Regulamin</a>
           </div>
         </div>
