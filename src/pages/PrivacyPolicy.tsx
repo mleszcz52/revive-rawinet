@@ -79,12 +79,11 @@ const PrivacyPolicy = () => {
                   <p className="text-muted-foreground mb-2">
                     <strong>Zakres danych:</strong> Adres IP przypisany do urządzenia, adres MAC routera/karty sieciowej, 
                     logi systemowe routera (np. ONT HALNY), lokalizacja zakończenia sieci, parametry sygnału 
-                    (tłumienie, moc), wyniki testów prędkości (Speedtest/Fireprobe).
+                    (tłumienie, moc).
                   </p>
                   <p className="text-muted-foreground mb-2">
                     <strong>Specyfika przetwarzania:</strong> Operator wykorzystuje zdalne protokoły zarządzania 
-                    (np. TR-069) do konfiguracji urządzeń abonenckich. Zgłoszenia awarii przesyłane drogą SMS 
-                    na numery serwisowe są rejestrowane w systemie obsługi zgłoszeń.
+                    (np. TR-069) do konfiguracji urządzeń abonenckich.
                   </p>
                   <p className="text-muted-foreground">
                     <strong>Podstawa prawna:</strong> Art. 6 ust. 1 lit. b RODO (zapewnienie jakości usługi zgodnej z umową) 
@@ -320,38 +319,6 @@ const PrivacyPolicy = () => {
                 pisemnie na adres siedziby w Rawiczu. Administrator udziela odpowiedzi w terminie 30 dni.
               </p>
             </section>
-
-            {/* Section VII */}
-            <section className="mb-10">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">
-                VII. Środki Bezpieczeństwa
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Rawi-Net Sp. z o.o. stosuje wielowarstwowe zabezpieczenia:
-              </p>
-
-              <div className="space-y-4">
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Cyfrowe</h3>
-                  <p className="text-muted-foreground">
-                    Szyfrowanie SSL/TLS transmisji danych na stronie WWW (protokół HTTPS), separacja sieci zarządzającej 
-                    od sieci publicznej, firewalle brzegowe.
-                  </p>
-                </div>
-
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Fizyczne</h3>
-                  <p className="text-muted-foreground">
-                    Kontrola dostępu do Biura Obsługi Klienta przy ul. Mikołajewicza 8B/1, monitoring serwerowni, 
-                    zabezpieczenie dokumentacji papierowej w szafach ognioodpornych.
-                  </p>
-                </div>
-
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Organizacyjne</h3>
-                  <p className="text-muted-foreground">
-                    Regularne szkolenia personelu z zakresu ochrony danych, stosowanie polityki "czystego biurka".
-                  </p>
                 </div>
               </div>
             </section>
