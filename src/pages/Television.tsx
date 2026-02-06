@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JamboxChannels } from "@/components/JamboxChannels";
-import { Check, Tv, Film, Monitor, Phone, Plus, Users } from "lucide-react";
+import { Check, Tv, Film, Monitor, Phone, Plus, Users, Info, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import tvSmartDecoder from "@/assets/tv-smart-decoder.jpg";
@@ -367,6 +367,44 @@ const Television = () => {
           </div>
         </section>
 
+        {/* Pricing Info Section */}
+        <section className="py-12 lg:py-16 bg-muted/30">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-start gap-4 p-6 bg-card rounded-2xl border border-border shadow-card">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Info className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">Ważne informacje o cenach</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Ceny pakietów telewizyjnych dotyczą dostępu do TV dla <strong className="text-foreground">jednego odbiornika</strong>. 
+                    Dla każdego następnego odbiornika TV należy doliczyć opłatę miesięczną za dzierżawę dekodera i multiroom.
+                  </p>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-xs text-muted-foreground mb-1">Dzierżawa dekodera + TV SMART</p>
+                      <p className="text-lg font-bold text-primary">15 zł<span className="text-sm font-normal text-muted-foreground">/mies.</span></p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-xs text-muted-foreground mb-1">Multiroom (za odbiornik)</p>
+                      <p className="text-lg font-bold text-primary">10 zł<span className="text-sm font-normal text-muted-foreground">/mies.</span></p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-xs text-muted-foreground mb-1">Opłata instalacyjna</p>
+                      <p className="text-lg font-bold text-primary">20 zł<span className="text-sm font-normal text-muted-foreground"> jednorazowo</span></p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-xs text-muted-foreground mb-1">Okres umowy</p>
+                      <p className="text-lg font-bold text-foreground">Czas nieokreślony</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Multiroom Section */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
@@ -380,7 +418,7 @@ const Television = () => {
                   <span className="text-gradient">Multiroom</span> - telewizja w każdym pokoju
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Jeden abonament, a każdy domownik oglądaje co chce - niezależnie i bez zakłóceń.
+                  Jeden abonament, a każdy domownik ogląda co chce - niezależnie i bez zakłóceń.
                 </p>
               </div>
 
@@ -431,41 +469,40 @@ const Television = () => {
                 </div>
 
                 {/* Right - CTA Card */}
-                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 p-8 text-center">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                    <Users className="w-10 h-10 text-primary" />
+                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 p-8">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <CreditCard className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      Cennik Multiroom
+                    </h3>
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground mb-4">
-                    Oszczędzasz z Multiroom
-                  </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Płacisz tylko za usługę multiroom - bez względu na wybrany pakiet programów. 
-                    Jeden abonament, a dużo więcej przyjemności z oglądania dla całej rodziny!
-                  </p>
-                  <ul className="space-y-3 mb-8 text-left max-w-xs mx-auto">
-                    <li className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-green-500" />
-                      </div>
-                      <span className="text-muted-foreground">Koniec kłótni o pilota</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-green-500" />
-                      </div>
-                      <span className="text-muted-foreground">Bez utraty jakości</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-green-500" />
-                      </div>
-                      <span className="text-muted-foreground">Jeden abonament</span>
-                    </li>
-                  </ul>
-                  <a href="tel:505051376">
-                    <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  
+                  <div className="space-y-4 mb-6">
+                    <div className="flex justify-between items-center p-3 bg-card/50 rounded-lg">
+                      <span className="text-muted-foreground">Dzierżawa dekodera + TV SMART</span>
+                      <span className="font-bold text-primary">15 zł/mies.</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-card/50 rounded-lg">
+                      <span className="text-muted-foreground">Opłata Multiroom</span>
+                      <span className="font-bold text-primary">10 zł/mies.</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-card/50 rounded-lg">
+                      <span className="text-muted-foreground">Instalacja (jednorazowo)</span>
+                      <span className="font-bold text-primary">20 zł</span>
+                    </div>
+                  </div>
+
+                  <div className="text-center text-sm text-muted-foreground mb-6 p-3 bg-muted/30 rounded-lg">
+                    <strong className="text-foreground">Razem za dodatkowy odbiornik:</strong><br/>
+                    25 zł brutto/mies. + 20 zł instalacja
+                  </div>
+
+                  <a href="tel:505051376" className="block">
+                    <Button size="lg" className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow">
                       <Phone className="w-5 h-5 mr-2" />
-                      Zapytaj o Multiroom
+                      Zamów Multiroom
                     </Button>
                   </a>
                 </div>
