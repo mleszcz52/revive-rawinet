@@ -10,6 +10,7 @@ interface RouterOption {
   icon: typeof Router;
   image: string;
   recommended?: boolean;
+  ontNote?: string;
   pros: string[];
   cons: string[];
 }
@@ -22,6 +23,7 @@ const routerOptions: RouterOption[] = [
     priceType: "free",
     icon: Router,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/routernoname-1-683x1024.webp",
+    ontNote: "Światłowód zakończony ONT Raisecom",
     pros: [
       "Brak dodatkowych opłat",
       "Pełna kontrola nad urządzeniem",
@@ -41,6 +43,7 @@ const routerOptions: RouterOption[] = [
     icon: Wifi,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/ax12.jpg",
     recommended: true,
+    ontNote: "Światłowód zakończony ONT Raisecom",
     pros: [
       "Jednorazowy zakup na własność",
       "Wi-Fi 6 do 1201 Mbps",
@@ -111,23 +114,6 @@ export const RouterOptions = () => {
           </p>
         </div>
 
-        {/* ONT Info */}
-        <div className="max-w-2xl mx-auto mb-12 p-6 bg-card rounded-2xl border border-border shadow-card">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Box className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">Zakończenie światłowodu</h3>
-              <p className="text-muted-foreground text-sm">
-                Przy wyborze <strong className="text-foreground">własnego routera</strong> lub <strong className="text-foreground">TP-LINK AX-12</strong>, 
-                światłowód zakończony jest małym urządzeniem <strong className="text-foreground">ONT Raisecom</strong>, 
-                do którego podłączasz router. <strong className="text-foreground">HALNY</strong> to urządzenie 2w1 – łączy ONT i router w jednej obudowie.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Router Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {routerOptions.map((option, index) => (
@@ -165,6 +151,14 @@ export const RouterOptions = () => {
                   <h3 className="text-xl font-bold text-foreground mb-4">{option.title}</h3>
                   <PriceLabel price={option.price} type={option.priceType} />
                 </div>
+
+                {/* ONT Note */}
+                {option.ontNote && (
+                  <div className="flex items-center gap-2 justify-center mb-6 px-3 py-2 bg-primary/10 rounded-lg">
+                    <Box className="w-4 h-4 text-primary flex-shrink-0" />
+                    <span className="text-xs font-medium text-primary">{option.ontNote}</span>
+                  </div>
+                )}
 
                 {/* Divider */}
                 <div className="h-px bg-border mb-6" />
