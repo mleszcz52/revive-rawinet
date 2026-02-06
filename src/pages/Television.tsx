@@ -381,7 +381,7 @@ const Television = () => {
                     Ceny pakietów telewizyjnych dotyczą dostępu do TV dla <strong className="text-foreground">jednego odbiornika</strong>. 
                     Dla każdego następnego odbiornika TV należy doliczyć opłatę miesięczną za dzierżawę dekodera i multiroom.
                   </p>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid sm:grid-cols-3 gap-4">
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-xs text-muted-foreground mb-1">Dzierżawa dekodera + TV SMART</p>
                       <p className="text-lg font-bold text-primary">15 zł<span className="text-sm font-normal text-muted-foreground">/mies.</span></p>
@@ -389,10 +389,6 @@ const Television = () => {
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-xs text-muted-foreground mb-1">Multiroom (za odbiornik)</p>
                       <p className="text-lg font-bold text-primary">10 zł<span className="text-sm font-normal text-muted-foreground">/mies.</span></p>
-                    </div>
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <p className="text-xs text-muted-foreground mb-1">Opłata instalacyjna</p>
-                      <p className="text-lg font-bold text-primary">20 zł<span className="text-sm font-normal text-muted-foreground"> jednorazowo</span></p>
                     </div>
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-xs text-muted-foreground mb-1">Okres umowy</p>
@@ -425,20 +421,6 @@ const Television = () => {
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 {/* Left - Features */}
                 <div className="space-y-6">
-                  <div className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Tv className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-2">Do 3 dekoderów</h3>
-                        <p className="text-muted-foreground text-sm">
-                          Multiroom umożliwia odbiór telewizji jednocześnie na do 3 dekoderach w Twoim domu.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -488,15 +470,11 @@ const Television = () => {
                       <span className="text-muted-foreground">Opłata Multiroom</span>
                       <span className="font-bold text-primary">10 zł/mies.</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-card/50 rounded-lg">
-                      <span className="text-muted-foreground">Instalacja (jednorazowo)</span>
-                      <span className="font-bold text-primary">20 zł</span>
-                    </div>
                   </div>
 
                   <div className="text-center text-sm text-muted-foreground mb-6 p-3 bg-muted/30 rounded-lg">
                     <strong className="text-foreground">Razem za dodatkowy odbiornik:</strong><br/>
-                    25 zł brutto/mies. + 20 zł instalacja
+                    25 zł brutto/mies.
                   </div>
 
                   <a href="tel:505051376" className="block">
