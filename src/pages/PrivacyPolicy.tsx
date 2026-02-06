@@ -319,9 +319,6 @@ const PrivacyPolicy = () => {
                 pisemnie na adres siedziby w Rawiczu. Administrator udziela odpowiedzi w terminie 30 dni.
               </p>
             </section>
-                </div>
-              </div>
-            </section>
 
           </div>
         </div>
