@@ -110,6 +110,22 @@ export const RouterOptions = () => {
           </p>
         </div>
 
+        {/* ONT Info */}
+        <div className="max-w-2xl mx-auto mb-12 p-6 bg-card rounded-2xl border border-border shadow-card">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Box className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-2">Zakończenie światłowodu</h3>
+              <p className="text-muted-foreground text-sm">
+                Każde przyłącze światłowodowe zakończone jest małym urządzeniem <strong className="text-foreground">ONT Raisecom</strong>, 
+                które konwertuje sygnał optyczny na sygnał elektryczny. Do ONT podłączasz wybrany router WiFi.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Router Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {routerOptions.map((option, index) => (
