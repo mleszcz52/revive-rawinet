@@ -1,7 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JamboxChannels } from "@/components/JamboxChannels";
-import { Check, Tv, Film, Monitor, Phone, Plus } from "lucide-react";
+import { Check, Tv, Film, Monitor, Phone, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import tvSmartDecoder from "@/assets/tv-smart-decoder.jpg";
@@ -367,8 +367,115 @@ const Television = () => {
           </div>
         </section>
 
-        {/* Smart TV Info */}
+        {/* Multiroom Section */}
         <section className="py-16 lg:py-24">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                  <Users className="w-4 h-4 inline mr-1" />
+                  Dla całej rodziny
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+                  <span className="text-gradient">Multiroom</span> - telewizja w każdym pokoju
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Jeden abonament, a każdy domownik oglądaje co chce - niezależnie i bez zakłóceń.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Left - Features */}
+                <div className="space-y-6">
+                  <div className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Tv className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Do 3 dekoderów</h3>
+                        <p className="text-muted-foreground text-sm">
+                          Multiroom umożliwia odbiór telewizji jednocześnie na do 3 dekoderach w Twoim domu.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Users className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Niezależne oglądanie</h3>
+                        <p className="text-muted-foreground text-sm">
+                          Każdy domownik może oglądać co chce - Ty serial, a ktoś inny mecz, bez żadnych zakłóceń.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card rounded-xl border border-border p-6 hover:shadow-card-hover transition-all">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Check className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-2">Ten sam pakiet wszędzie</h3>
+                        <p className="text-muted-foreground text-sm">
+                          Na każdym dekoderze masz dokładnie ten sam wybrany pakiet telewizji w pełnej jakości.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right - CTA Card */}
+                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 p-8 text-center">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <Users className="w-10 h-10 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-4">
+                    Oszczędzasz z Multiroom
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    Płacisz tylko za usługę multiroom - bez względu na wybrany pakiet programów. 
+                    Jeden abonament, a dużo więcej przyjemności z oglądania dla całej rodziny!
+                  </p>
+                  <ul className="space-y-3 mb-8 text-left max-w-xs mx-auto">
+                    <li className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-green-500" />
+                      </div>
+                      <span className="text-muted-foreground">Koniec kłótni o pilota</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-green-500" />
+                      </div>
+                      <span className="text-muted-foreground">Bez utraty jakości</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                        <Check className="w-3 h-3 text-green-500" />
+                      </div>
+                      <span className="text-muted-foreground">Jeden abonament</span>
+                    </li>
+                  </ul>
+                  <a href="tel:505051376">
+                    <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                      <Phone className="w-5 h-5 mr-2" />
+                      Zapytaj o Multiroom
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Smart TV Info */}
+        <section className="py-16 lg:py-24 bg-muted/30">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold text-foreground mb-6">
