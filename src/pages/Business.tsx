@@ -53,18 +53,16 @@ const Business = () => {
                 Wysokiej jakości dostęp do krajowych i zagranicznych zasobów sieci Internet. 
                 Oferujemy szeroki zakres przepustowości, pozwalający na dostosowanie rozwiązań do bieżącego zapotrzebowania Klienta.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
                     505 051 376 (Biuro)
                   </Button>
                 </a>
-                <a href="tel:605934593">
-                  <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
-                    <Phone className="w-5 h-5 mr-2" />
-                    605 934 593 (Dział techniczny)
-                  </Button>
+                <a href="tel:605934593" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">605 934 593 (Dział techniczny)</span>
                 </a>
               </div>
             </div>

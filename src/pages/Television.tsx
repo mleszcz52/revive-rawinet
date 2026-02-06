@@ -123,18 +123,16 @@ const Television = () => {
                   <span>Pakiety premium</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
                     505 051 376 (Biuro)
                   </Button>
                 </a>
-                <a href="tel:605934593">
-                  <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
-                    <Phone className="w-5 h-5 mr-2" />
-                    605 934 593 (Dział techniczny)
-                  </Button>
+                <a href="tel:605934593" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">605 934 593 (Dział techniczny)</span>
                 </a>
               </div>
             </div>
@@ -176,16 +174,10 @@ const Television = () => {
                   <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">VOD</span>
                   <span className="px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm">Streaming</span>
                 </div>
-                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                <div className="flex justify-center lg:justify-start">
                   <a href="https://www.jambox.pl/tvsmart" target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 w-full sm:w-auto font-semibold">
-                      Więcej informacji
-                    </Button>
-                  </a>
-                  <a href="tel:505051376">
-                    <Button className="gradient-primary text-primary-foreground font-semibold shadow-glow w-full sm:w-auto">
-                      <Phone className="w-4 h-4 mr-2" />
-                      Zamów teraz
+                    <Button variant="outline" className="border-white/50 bg-white/10 text-white hover:bg-white/20 font-semibold">
+                      Więcej informacji o TV Smart
                     </Button>
                   </a>
                 </div>
@@ -236,7 +228,7 @@ const Television = () => {
                       <span className="text-2xl font-bold text-foreground">{pkg.price}</span>
                     </div>
 
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-3">
                       {pkg.features.map((feature, i) => (
                         <li key={i} className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -246,19 +238,6 @@ const Television = () => {
                         </li>
                       ))}
                     </ul>
-
-                    <a href="tel:505051376">
-                      <Button
-                        className={cn(
-                          "w-full font-semibold",
-                          pkg.popular
-                            ? "gradient-primary text-primary-foreground shadow-glow"
-                            : "bg-secondary text-secondary-foreground"
-                        )}
-                      >
-                        Zadzwoń i zamów
-                      </Button>
-                    </a>
                   </div>
                 </div>
               ))}
@@ -341,14 +320,6 @@ const Television = () => {
               ))}
             </div>
 
-            <div className="text-center mt-10">
-              <a href="tel:505051376">
-                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Zamów pakiet dodatkowy
-                </Button>
-              </a>
-            </div>
           </div>
         </section>
 
@@ -496,15 +467,10 @@ const Television = () => {
               <h2 className="text-3xl font-bold text-foreground mb-6">
                 Smart TV - Oglądaj gdzie chcesz
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-lg text-muted-foreground">
                 Dzięki usłudze Smart TV możesz oglądać telewizję na smartfonie, tablecie lub komputerze. 
                 Telewizja dostępna również przez aplikację JAMBOX GO.
               </p>
-              <a href="tel:505051376">
-                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
-                  Zapytaj o szczegóły
-                </Button>
-              </a>
             </div>
           </div>
         </section>

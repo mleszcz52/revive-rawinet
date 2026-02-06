@@ -62,18 +62,16 @@ const InternetTV = () => {
                   <span>Do 179 kanałów HD</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
                     505 051 376 (Biuro)
                   </Button>
                 </a>
-                <a href="tel:605934593">
-                  <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
-                    <Phone className="w-5 h-5 mr-2" />
-                    605 934 593 (Dział techniczny)
-                  </Button>
+                <a href="tel:605934593" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">605 934 593 (Dział techniczny)</span>
                 </a>
               </div>
             </div>
@@ -135,7 +133,7 @@ const InternetTV = () => {
                         <span className="text-muted-foreground"> zł brutto</span>
                       </div>
 
-                      <ul className="space-y-3 mb-8">
+                      <ul className="space-y-3">
                         <li className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
                             <Check className="w-3 h-3 text-green-500" />
@@ -161,19 +159,6 @@ const InternetTV = () => {
                           <span className="text-muted-foreground">Telewizja JAMBOX</span>
                         </li>
                       </ul>
-
-                      <a href="tel:505051376">
-                        <Button
-                          className={cn(
-                            "w-full font-semibold",
-                            index === 1
-                              ? "gradient-primary text-primary-foreground shadow-glow"
-                              : "bg-secondary text-secondary-foreground"
-                          )}
-                        >
-                          Zadzwoń i zamów
-                        </Button>
-                      </a>
                     </div>
                   </div>
                 ))}
@@ -181,6 +166,21 @@ const InternetTV = () => {
             </div>
           </section>
         ))}
+
+        {/* Single CTA at bottom */}
+        <section className="py-12 lg:py-16 bg-muted/30">
+          <div className="container mx-auto px-4 lg:px-8 text-center">
+            <p className="text-muted-foreground mb-6">
+              Masz pytania? Zadzwoń i zamów pakiet dopasowany do Twoich potrzeb.
+            </p>
+            <a href="tel:505051376">
+              <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                <Phone className="w-5 h-5 mr-2" />
+                Zamów pakiet: 505 051 376
+              </Button>
+            </a>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>

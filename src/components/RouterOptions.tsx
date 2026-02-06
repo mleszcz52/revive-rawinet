@@ -1,4 +1,4 @@
-import { Check, X, Wifi, Router, Box } from "lucide-react";
+import { Check, X, Wifi, Router, Box, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -189,20 +189,19 @@ export const RouterOptions = () => {
                   ))}
                 </div>
 
-                {/* CTA Button */}
-                <Button 
-                  className={cn(
-                    "w-full font-semibold transition-all duration-300",
-                    option.recommended 
-                      ? "gradient-primary text-primary-foreground shadow-glow hover:shadow-card-hover hover:scale-105" 
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  )}
-                >
-                  Wybierz opcję
-                </Button>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Single CTA Button */}
+        <div className="text-center mt-12">
+          <a href="tel:505051376">
+            <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+              <Phone className="w-5 h-5 mr-2" />
+              Zapytaj o router: 505 051 376
+            </Button>
+          </a>
         </div>
       </div>
     </section>

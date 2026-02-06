@@ -61,18 +61,16 @@ const Internet = () => {
                   <span>Bez limitu</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <a href="tel:505051376">
                   <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
                     <Phone className="w-5 h-5 mr-2" />
                     505 051 376 (Biuro)
                   </Button>
                 </a>
-                <a href="tel:605934593">
-                  <Button size="lg" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 font-semibold">
-                    <Phone className="w-5 h-5 mr-2" />
-                    605 934 593 (Dział techniczny)
-                  </Button>
+                <a href="tel:605934593" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">605 934 593 (Dział techniczny)</span>
                 </a>
               </div>
             </div>
@@ -120,7 +118,7 @@ const Internet = () => {
                       <span className="text-2xl font-bold text-foreground">{plan.price}</span>
                     </div>
 
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-3">
                       {plan.features.map((feature, i) => (
                         <li key={i} className="flex items-center gap-3">
                           <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -130,22 +128,19 @@ const Internet = () => {
                         </li>
                       ))}
                     </ul>
-
-                    <a href="tel:505051376">
-                      <Button
-                        className={cn(
-                          "w-full font-semibold",
-                          plan.popular
-                            ? "gradient-primary text-primary-foreground shadow-glow"
-                            : "bg-secondary text-secondary-foreground"
-                        )}
-                      >
-                        Zadzwoń i zamów
-                      </Button>
-                    </a>
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Single CTA */}
+            <div className="text-center mt-12">
+              <a href="tel:505051376">
+                <Button size="lg" className="gradient-primary text-primary-foreground font-semibold shadow-glow">
+                  <Phone className="w-5 h-5 mr-2" />
+                  Zamów internet: 505 051 376
+                </Button>
+              </a>
             </div>
 
             {/* Info Box */}
