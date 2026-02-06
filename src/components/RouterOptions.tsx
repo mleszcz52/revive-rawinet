@@ -60,6 +60,7 @@ const routerOptions: RouterOption[] = [
     icon: Box,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/HL-4BX3V-F_2-500x500-1.jpg",
     pros: [
+      "ONT i Router w jednym urządzeniu",
       "Niski miesięczny koszt",
       "Pełna kompatybilność z siecią",
       "Wi-Fi 6 AX3000 + MU-MIMO",
@@ -119,8 +120,9 @@ export const RouterOptions = () => {
             <div>
               <h3 className="font-semibold text-foreground mb-2">Zakończenie światłowodu</h3>
               <p className="text-muted-foreground text-sm">
-                Każde przyłącze światłowodowe zakończone jest małym urządzeniem <strong className="text-foreground">ONT Raisecom</strong>, 
-                które konwertuje sygnał optyczny na sygnał elektryczny. Do ONT podłączasz wybrany router WiFi.
+                Przy wyborze <strong className="text-foreground">własnego routera</strong> lub <strong className="text-foreground">TP-LINK AX-12</strong>, 
+                światłowód zakończony jest małym urządzeniem <strong className="text-foreground">ONT Raisecom</strong>, 
+                do którego podłączasz router. <strong className="text-foreground">HALNY</strong> to urządzenie 2w1 – łączy ONT i router w jednej obudowie.
               </p>
             </div>
           </div>
