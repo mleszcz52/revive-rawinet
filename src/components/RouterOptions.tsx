@@ -46,7 +46,7 @@ const routerOptions: RouterOption[] = [
     ontNote: "Światłowód zakończony ONT",
     pros: [
       "Jednorazowy zakup na własność",
-      "Wi-Fi 7 do 1201 Mbps",
+      "Wi-Fi 7 do 5760 Mbps",
       "4 anteny z beamformingiem",
       "Idealny do mieszkań 2-3 pokojowych",
     ],
