@@ -50,6 +50,7 @@ const routerOptions: RouterOption[] = [
       "Wi-Fi 7 do 5760 Mbps",
       "4 anteny z beamformingiem",
       "Idealny do mieszkań 2-3 pokojowych",
+      "Możliwość dokupienia routerów i połączenia w sieć Mesh",
     ],
     cons: [
       "Wyższy koszt początkowy",
