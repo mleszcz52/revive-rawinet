@@ -57,17 +57,15 @@ const routerOptions: RouterOption[] = [
   },
   {
     id: 3,
-    title: "HALNY HL-4BX3V-F",
+    title: "Podstawowy Router Wi-Fi 5",
     price: "10 zł",
     priceType: "monthly",
     icon: Box,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/HL-4BX3V-F_2-500x500-1.jpg",
     pros: [
-      "ONT i Router w jednym urządzeniu",
       "Niski miesięczny koszt",
+      "Wi-Fi 5 AC1200",
       "Pełna kompatybilność z siecią",
-      "Wi-Fi 6 AX3000 + MU-MIMO",
-      "Port 2,5 Gigabit LAN",
       "Wsparcie i zdalna diagnostyka",
     ],
     cons: [
