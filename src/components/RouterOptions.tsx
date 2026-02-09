@@ -1,7 +1,7 @@
 import { Check, X, Wifi, Router, Box, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
+import routerWifi5Image from "@/assets/router-wifi5-basic.jpg";
 interface RouterOption {
   id: number;
   title: string;
@@ -61,7 +61,7 @@ const routerOptions: RouterOption[] = [
     price: "10 zł",
     priceType: "monthly",
     icon: Box,
-    image: "https://rawinet.pl/wp-content/uploads/2025/05/HL-4BX3V-F_2-500x500-1.jpg",
+    image: routerWifi5Image,
     pros: [
       "Niski miesięczny koszt",
       "Wi-Fi 5 AC1200",
