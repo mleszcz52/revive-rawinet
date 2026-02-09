@@ -1,10 +1,8 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Check, X, Clock, Calculator, Cpu, FileText, Shield, Heart, MapPin } from "lucide-react";
-
 const WhyUs = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       <main>
         {/* Hero Section */}
@@ -333,7 +331,7 @@ const WhyUs = () => {
                 </p>
                 <p className="text-2xl md:text-3xl font-bold flex items-center justify-center gap-2">
                   <Heart className="w-8 h-8" />
-                  Podłącz się do sieci sąsiedzkiej.
+                  Podłącz się do sieci lokalnej.
                 </p>
               </div>
             </div>
@@ -341,8 +339,6 @@ const WhyUs = () => {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default WhyUs;
