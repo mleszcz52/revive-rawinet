@@ -2,6 +2,7 @@ import { Check, X, Wifi, Router, Box, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import routerWifi5Image from "@/assets/router-wifi5-basic.jpg";
+import routerWifi7Image from "@/assets/router-wifi7.jpg";
 interface RouterOption {
   id: number;
   title: string;
@@ -41,7 +42,7 @@ const routerOptions: RouterOption[] = [
     price: "177 zł",
     priceType: "once",
     icon: Wifi,
-    image: "https://rawinet.pl/wp-content/uploads/2025/05/ax12.jpg",
+    image: routerWifi7Image,
     recommended: true,
     ontNote: "Światłowód zakończony ONT",
     pros: [
