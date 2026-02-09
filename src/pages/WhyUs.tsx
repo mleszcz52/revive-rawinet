@@ -45,11 +45,11 @@ const WhyUs = () => {
         <section className="py-12 lg:py-16 bg-muted/30">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
-                  <Clock className="w-7 h-7 text-primary-foreground" />
+              <div className="flex items-start gap-4 mb-8">
+                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                  <Clock className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground shrink-0" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
                   1. Umowa: Twoja wolność vs. Ich kajdanki
                 </h2>
               </div>
@@ -94,11 +94,11 @@ const WhyUs = () => {
         <section className="py-12 lg:py-16">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
-                  <Calculator className="w-7 h-7 text-primary-foreground" />
+              <div className="flex items-start gap-4 mb-8">
+                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                  <Calculator className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground shrink-0" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
                   2. Matematyka nie kłamie: Ile zapłacisz przez 2 lata?
                 </h2>
               </div>
@@ -186,11 +186,11 @@ const WhyUs = () => {
         <section className="py-12 lg:py-16 bg-muted/30">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
-                  <Cpu className="w-7 h-7 text-primary-foreground" />
+              <div className="flex items-start gap-4 mb-8">
+                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                  <Cpu className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground shrink-0" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
                   3. Sprzęt: Twój wybór, a nie przymus
                 </h2>
               </div>
@@ -243,11 +243,11 @@ const WhyUs = () => {
         <section className="py-12 lg:py-16">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
-                  <FileText className="w-7 h-7 text-primary-foreground" />
+              <div className="flex items-start gap-4 mb-8">
+                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                  <FileText className="w-6 h-6 md:w-7 md:h-7 text-primary-foreground shrink-0" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
                   4. Przejrzystość: 3 strony vs. Tomy regulaminów
                 </h2>
               </div>
