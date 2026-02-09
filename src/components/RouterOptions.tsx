@@ -1,7 +1,7 @@
 import { Check, X, Wifi, Router, Box, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import routerWifi5Image from "@/assets/router-wifi5-basic.jpg";
+import routerWifi5Image from "@/assets/router-wifi5-basic.png";
 import routerWifi7Image from "@/assets/router-wifi7.jpg";
 interface RouterOption {
   id: number;
