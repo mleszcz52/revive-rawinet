@@ -148,7 +148,7 @@ const Internet = () => {
               <h3 className="text-lg font-bold text-foreground mb-4">Ważne informacje</h3>
               <ul className="space-y-2 text-muted-foreground text-sm">
                 <li>• Urządzeniem końcowym dostarczanym przez operatora jest konwerter sieci światłowodowej na Ethernet (tzw. ONT).</li>
-                <li>• Klient może podłączyć własny router WiFi lub zakupić rekomendowany przez RawiNet router WiFi TP-Link w cenie 177 zł lub wydzierżawić za 10zł brutto miesięcznie od RawiNet ONT Router firmy HALNY.</li>
+                <li>• Klient może podłączyć własny router WiFi lub zakupić rekomendowany przez RawiNet Router Wi-Fi 7 lub wydzierżawić Podstawowy Router za 10zł brutto miesięcznie.</li>
                 <li>• Powyższa oferta dotyczy klientów uruchamianych na terenie powiatu rawickiego w sieci światłowodowej GPON.</li>
                 <li>• Deklarowane prędkości pobierania i wysyłania danych (download/upload) są prędkościami maksymalnymi lub przewidywanymi dla danego pakietu usług.</li>
               </ul>
