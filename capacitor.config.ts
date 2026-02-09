@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.39f20c53a2654e38aab371ccb62771a6',
+  appId: 'pl.rawinet.panel',
   appName: 'Rawinet Panel Klienta',
   webDir: 'dist',
   server: {
