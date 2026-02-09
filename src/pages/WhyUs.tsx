@@ -157,10 +157,10 @@ const WhyUs = () => {
                       <span className="font-semibold text-primary">0 zł</span>
                     </li>
                     <li className="flex justify-between">
-                      <span>Opłata instalacyjna (jednorazowo):</span>
+                      <span>Opłata aktywacyjna (jednorazowo):</span>
                       <span className="font-semibold">249 zł</span>
                     </li>
-                    <li className="text-sm italic">(uczciwa opłata na start, zamiast ukrytych kosztów w abonamencie)</li>
+                    <li className="text-sm italic">(uczciwa opłata na start, opłata instalacyjna wyliczana indywidualnie)</li>
                   </ul>
                   <div className="mt-6 pt-4 border-t border-primary/20">
                     <div className="flex justify-between items-center">
