@@ -114,28 +114,28 @@ const WhyUs = () => {
                     <X className="w-5 h-5" />
                     Scenariusz rynkowy (Duży Operator)
                   </h3>
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li className="flex justify-between">
+                  <ul className="space-y-3 text-muted-foreground text-sm md:text-base">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Abonament (pierwsze 6 mies.):</span>
-                      <span className="font-semibold">60 zł</span>
+                      <span className="font-semibold text-foreground">60 zł</span>
                     </li>
-                    <li className="flex justify-between">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Abonament po podwyżce (18 mies.):</span>
-                      <span className="font-semibold">90 zł</span>
+                      <span className="font-semibold text-foreground">90 zł</span>
                     </li>
-                    <li className="flex justify-between">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Opłata za "domek":</span>
-                      <span className="font-semibold">+20 zł/mies.</span>
+                      <span className="font-semibold text-foreground">+20 zł/mies.</span>
                     </li>
-                    <li className="flex justify-between">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Aktywacja:</span>
-                      <span className="font-semibold">1 zł</span>
+                      <span className="font-semibold text-foreground">1 zł</span>
                     </li>
                   </ul>
                   <div className="mt-6 pt-4 border-t border-border">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="font-bold text-foreground">RAZEM po 2 latach:</span>
-                      <span className="text-2xl font-bold text-destructive">ok. 2460 zł</span>
+                      <span className="text-xl md:text-2xl font-bold text-destructive">ok. 2460 zł</span>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2">(i nadal wiąże Cię umowa!)</p>
                   </div>
@@ -147,25 +147,25 @@ const WhyUs = () => {
                     <Check className="w-5 h-5" />
                     Scenariusz Rawi-Net (Pakiet KOMFORT)
                   </h3>
-                  <ul className="space-y-3 text-muted-foreground">
-                    <li className="flex justify-between">
+                  <ul className="space-y-3 text-muted-foreground text-sm md:text-base">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Abonament (stała cena):</span>
-                      <span className="font-semibold">59,99 zł</span>
+                      <span className="font-semibold text-foreground">59,99 zł</span>
                     </li>
-                    <li className="flex justify-between">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Opłata za "domek":</span>
                       <span className="font-semibold text-primary">0 zł</span>
                     </li>
-                    <li className="flex justify-between">
+                    <li className="flex flex-col sm:flex-row sm:justify-between gap-1">
                       <span>Opłata aktywacyjna (jednorazowo):</span>
-                      <span className="font-semibold">249 zł</span>
+                      <span className="font-semibold text-foreground">249 zł</span>
                     </li>
-                    <li className="text-sm italic">(uczciwa opłata na start, opłata instalacyjna wyliczana indywidualnie)</li>
+                    <li className="text-xs md:text-sm italic">(uczciwa opłata na start, opłata instalacyjna wyliczana indywidualnie)</li>
                   </ul>
                   <div className="mt-6 pt-4 border-t border-primary/20">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
                       <span className="font-bold text-foreground">RAZEM po 2 latach:</span>
-                      <span className="text-2xl font-bold text-primary">ok. 1688 zł</span>
+                      <span className="text-xl md:text-2xl font-bold text-primary">ok. 1688 zł</span>
                     </div>
                   </div>
                 </div>
