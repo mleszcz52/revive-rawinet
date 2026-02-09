@@ -133,7 +133,7 @@ export const ClientPanel = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [activeTab, setActiveTab] = useState<"info" | "invoices" | "payments">("info");
+  const [activeTab, setActiveTab] = useState<"info" | "invoices">("info");
   const [showAllInvoices, setShowAllInvoices] = useState(false);
 
   // Restore session on mount
@@ -733,18 +733,6 @@ export const ClientPanel = () => {
           <span className="sm:hidden">({displayedInvoices.length})</span>
           <span className="hidden sm:inline">Faktury ({displayedInvoices.length})</span>
         </Button>
-        <Button
-          variant={activeTab === "payments" ? "default" : "outline"}
-          onClick={() => setActiveTab("payments")}
-          className={cn(
-            "shrink-0",
-            activeTab === "payments" ? "gradient-primary text-primary-foreground" : ""
-          )}
-        >
-          <CreditCard className="w-4 h-4 sm:mr-2" />
-          <span className="sm:hidden">({payments.length})</span>
-          <span className="hidden sm:inline">Płatności ({payments.length})</span>
-        </Button>
       </div>
 
       {/* Tab Content */}
@@ -868,28 +856,6 @@ export const ClientPanel = () => {
           </div>
         )}
 
-        {activeTab === "payments" && (
-          <div>
-            {payments.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Brak płatności</p>
-            ) : (
-              <div className="space-y-4">
-                {payments.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50"
-                  >
-                    <div>
-                      <p className="font-semibold text-foreground">{payment.name}</p>
-                      <p className="text-sm text-muted-foreground">Data: {payment.paid_date}</p>
-                    </div>
-                    <p className="font-bold text-green-600">+{payment.price} PLN</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
