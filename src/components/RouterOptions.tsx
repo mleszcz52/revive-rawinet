@@ -23,7 +23,7 @@ const routerOptions: RouterOption[] = [
     priceType: "free",
     icon: Router,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/routernoname-1-683x1024.webp",
-    ontNote: "Światłowód zakończony ONT Raisecom",
+    ontNote: "Światłowód zakończony ONT",
     pros: [
       "Brak dodatkowych opłat",
       "Pełna kontrola nad urządzeniem",
@@ -37,13 +37,13 @@ const routerOptions: RouterOption[] = [
   },
   {
     id: 2,
-    title: "TP-LINK AX-12",
+    title: "Router Wi-Fi 7",
     price: "177 zł",
     priceType: "once",
     icon: Wifi,
     image: "https://rawinet.pl/wp-content/uploads/2025/05/ax12.jpg",
     recommended: true,
-    ontNote: "Światłowód zakończony ONT Raisecom",
+    ontNote: "Światłowód zakończony ONT",
     pros: [
       "Jednorazowy zakup na własność",
       "Wi-Fi 6 do 1201 Mbps",
@@ -131,7 +131,7 @@ export const RouterOptions = () => {
               {option.recommended && (
                 <div className="absolute top-0 left-0 right-0 gradient-primary py-2 text-center">
                   <span className="text-sm font-semibold text-primary-foreground">
-                    ⭐ Polecane
+                    ⭐ Rekomendowane
                   </span>
                 </div>
               )}
