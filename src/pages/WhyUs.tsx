@@ -217,7 +217,7 @@ const WhyUs = () => {
                     <span className="text-2xl font-bold text-primary">2</span>
                   </div>
                   <h4 className="font-bold text-foreground mb-2">Chcesz kupić?</h4>
-                  <p className="text-muted-foreground text-sm">Router TP-Link na własność</p>
+                  <p className="text-muted-foreground text-sm">Router Wi-Fi 7 na własność</p>
                   <p className="text-2xl font-bold text-primary mt-2">177 zł</p>
                   <p className="text-xs text-muted-foreground">jednorazowo</p>
                 </div>
