@@ -59,7 +59,7 @@ const routerOptions: RouterOption[] = [
   },
   {
     id: 3,
-    title: "Podstawowy Router Wi-Fi 5",
+    title: "Podstawowy Router",
     price: "10 zł",
     priceType: "monthly",
     icon: Box,
