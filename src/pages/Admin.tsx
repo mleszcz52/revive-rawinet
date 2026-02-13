@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import { Shield } from "lucide-react";
+import { DarkVeil } from "@/components/DarkVeil";
 
 interface AdminSession {
   token: string;
@@ -56,8 +57,9 @@ const Admin = () => {
       <Header />
       <main className="pt-20 lg:pt-24">
         {/* Hero Section */}
-        <section className="gradient-hero py-12 lg:py-16">
-          <div className="container mx-auto px-4 lg:px-8">
+        <section className="gradient-hero py-12 lg:py-16 relative overflow-hidden">
+          <DarkVeil speed={0.3} resolutionScale={0.75} />
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
             <div className="max-w-3xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">

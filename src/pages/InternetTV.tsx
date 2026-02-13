@@ -1,6 +1,7 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Check, Wifi, Tv, Phone } from "lucide-react";
+import { DarkVeil } from "@/components/DarkVeil";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +41,9 @@ const InternetTV = () => {
       <Header />
       <main className="pt-20 lg:pt-24">
         {/* Hero Section */}
-        <section className="gradient-hero py-16 lg:py-24">
-          <div className="container mx-auto px-4 lg:px-8">
+        <section className="gradient-hero py-16 lg:py-24 relative overflow-hidden">
+          <DarkVeil speed={0.3} resolutionScale={0.75} />
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
             <div className="max-w-3xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-4">
                 Pakiety łączone
