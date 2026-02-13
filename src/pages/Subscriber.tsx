@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { ClientPanel } from "@/components/ClientPanel";
 import { SpeedTestSection } from "@/components/SpeedTestSection";
 import { HelpCircle, Phone, Mail } from "lucide-react";
+import { DarkVeil } from "@/components/DarkVeil";
 
 const faqItems = [
   {
@@ -30,8 +31,9 @@ const Subscriber = () => {
       <Header />
       <main className="pt-20 lg:pt-24">
         {/* Hero Section */}
-        <section className="gradient-hero py-16 lg:py-20">
-          <div className="container mx-auto px-4 lg:px-8">
+        <section className="gradient-hero py-16 lg:py-20 relative overflow-hidden">
+          <DarkVeil speed={0.3} resolutionScale={0.75} />
+          <div className="container mx-auto px-4 lg:px-8 relative z-10">
             <div className="max-w-3xl">
               <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-4">
                 Strefa Abonenta
