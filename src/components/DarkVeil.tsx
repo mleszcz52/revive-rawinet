@@ -85,7 +85,7 @@ interface DarkVeilProps {
 }
 
 export const DarkVeil = ({
-  hueShift = 200,
+  hueShift = 240,
   noiseIntensity = 0,
   scanlineIntensity = 0,
   speed = 0.5,
