@@ -85,7 +85,7 @@ interface DarkVeilProps {
 }
 
 export const DarkVeil = ({
-  hueShift = 240,
+  hueShift = 0,
   noiseIntensity = 0,
   scanlineIntensity = 0,
   speed = 0.5,
@@ -165,7 +165,7 @@ export const DarkVeil = ({
     <canvas
       ref={ref}
       className={`absolute inset-0 w-full h-full ${className}`}
-      style={{ display: 'block' }}
+      style={{ display: 'block', opacity: 0.6 }}
     />
   );
 };
