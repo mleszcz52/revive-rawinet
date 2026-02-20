@@ -24,7 +24,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter basename="/nowastrona">
+      <BrowserRouter basename={import.meta.env.MODE === "production" ? "/nowastrona" : ""}>
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
