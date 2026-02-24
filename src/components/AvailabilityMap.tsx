@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin, Search, CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+
 import {
   Select,
   SelectContent,
@@ -49,21 +49,29 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   useEffect(() => {
     const loadKMZ = async () => {
       try {
-        // Try to load via edge function first (more secure)
-        const { data, error } = await supabase.functions.invoke('get-network-map', {
-          headers: { 'Content-Type': 'application/json' },
-        });
-
         let arrayBuffer: ArrayBuffer;
 
-        if (error || (data && data.fallback)) {
-          // Fallback to public file if edge function fails
+        try {
+          // Fetch edge function directly to preserve binary data
+          const edgeUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-network-map`;
+          const res = await fetch(edgeUrl, {
+            method: 'POST',
+            headers: {
+              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+          });
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            // Edge function returned JSON fallback flag
+            throw new Error('Edge function returned fallback');
+          }
+          arrayBuffer = await res.arrayBuffer();
+        } catch {
+          // Fallback to public file
           console.log('Using fallback public map file');
           const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
           arrayBuffer = await response.arrayBuffer();
-        } else {
-          // Edge function returned the file
-          arrayBuffer = data;
         }
         
         const zip = await JSZip.loadAsync(arrayBuffer);
