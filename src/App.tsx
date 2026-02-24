@@ -15,6 +15,8 @@ import Subscriber from "./pages/Subscriber";
 import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WhyUs from "./pages/WhyUs";
+import Regulations from "./pages/Regulations";
+import AccessibilityDeclaration from "./pages/AccessibilityDeclaration";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +39,8 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/polityka-prywatnosci" element={<PrivacyPolicy />} />
           <Route path="/dlaczego-my" element={<WhyUs />} />
+          <Route path="/regulamin" element={<Regulations />} />
+          <Route path="/deklaracja-dostepnosci" element={<AccessibilityDeclaration />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
