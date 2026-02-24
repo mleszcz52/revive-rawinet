@@ -60,9 +60,11 @@ const Regulations = () => {
               </h2>
               <ol className="list-decimal pl-6 space-y-2 text-muted-foreground">
                 <li>Umowa zostaje zawarta w formie pisemnej lub elektronicznej.</li>
-                <li>Umowa może być zawarta na czas określony lub nieokreślony.</li>
-                <li>Abonent może wypowiedzieć umowę zawartą na czas nieokreślony z zachowaniem jednomiesięcznego okresu wypowiedzenia ze skutkiem na koniec okresu rozliczeniowego.</li>
-                <li><span className="text-primary font-medium">[DO UZUPEŁNIENIA — szczegółowe warunki zawierania, zmiany i rozwiązywania umów]</span></li>
+                <li>Umowy zawierane są na <strong>czas nieokreślony</strong>.</li>
+                <li>Każda ze stron może wypowiedzieć umowę z zachowaniem <strong>30-dniowego okresu wypowiedzenia</strong>, ze skutkiem na koniec okresu rozliczeniowego.</li>
+                <li>Wypowiedzenie umowy wymaga formy pisemnej lub elektronicznej (e-mail na adres: biuro@rawinet.pl).</li>
+                <li>Operator może rozwiązać umowę bez zachowania okresu wypowiedzenia w przypadku rażącego naruszenia postanowień Regulaminu przez Abonenta, w szczególności zalegania z opłatami za okres dłuższy niż <span className="text-primary font-medium">[DO UZUPEŁNIENIA — np. 30 dni]</span>.</li>
+                <li>Zmiana warunków umowy wymaga zgody obu stron, z zastrzeżeniem zmian wynikających ze zmiany Regulaminu, o których Operator informuje z 30-dniowym wyprzedzeniem.</li>
               </ol>
             </section>
 
