@@ -99,9 +99,10 @@ export const Footer = () => {
             <p>NIP: 699-194-79-84 | REGON: 301729188</p>
             <p className="mt-1">© 2026 Rawi-Net. Wszelkie prawa zastrzeżone.</p>
           </div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <Link to="/polityka-prywatnosci" className="hover:text-primary transition-colors">Polityka prywatności</Link>
-            <a href="#" className="hover:text-primary transition-colors">Regulamin</a>
+            <Link to="/regulamin" className="hover:text-primary transition-colors">Regulamin</Link>
+            <Link to="/deklaracja-dostepnosci" className="hover:text-primary transition-colors">Deklaracja dostępności</Link>
           </div>
         </div>
       </div>
