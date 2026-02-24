@@ -10,21 +10,24 @@ const internetPlans = [
   {
     name: "Komfort",
     speed: "300 Mbps",
-    price: "Zapytaj",
+    price: "59,99 zł",
+    priceLabel: "brutto/mies.",
     features: ["Prędkość pobierania do 300 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie"],
     popular: false,
   },
   {
     name: "Premium",
     speed: "700 Mbps",
-    price: "Zapytaj",
+    price: "69,99 zł",
+    priceLabel: "brutto/mies.",
     features: ["Prędkość pobierania do 700 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie", "Idealne do streamingu 4K"],
     popular: true,
   },
   {
     name: "Biznes",
     speed: "1000 Mbps",
-    price: "Zapytaj",
+    price: "100 zł",
+    priceLabel: "brutto/mies.",
     features: ["Prędkość pobierania do 1000 Mbps", "Bez limitu danych", "Umowa na czas nieokreślony", "ONT w zestawie", "Maksymalna wydajność"],
     popular: false,
   },
@@ -118,6 +121,9 @@ const Internet = () => {
 
                     <div className="text-center mb-8">
                       <span className="text-2xl font-bold text-foreground">{plan.price}</span>
+                      {plan.priceLabel && (
+                        <span className="block text-sm text-muted-foreground mt-1">{plan.priceLabel}</span>
+                      )}
                     </div>
 
                     <ul className="space-y-3">
