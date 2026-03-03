@@ -31,7 +31,6 @@ const routerOptions: RouterOption[] = [
       "Możliwość korzystania ze sprawdzonego sprzętu",
     ],
     cons: [
-      "Samodzielna konfiguracja",
       "Brak gwarancji kompatybilności",
       "Starszy sprzęt może ograniczać wydajność",
     ],
