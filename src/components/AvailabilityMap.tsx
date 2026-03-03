@@ -22,6 +22,38 @@ interface AvailabilityMapProps {
 // Line segment type (array of points)
 type LineSegment = L.LatLng[];
 
+const parseKmzToLineSegments = async (arrayBuffer: ArrayBuffer): Promise<LineSegment[]> => {
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  const kmlFile = Object.keys(zip.files).find((name) => name.toLowerCase().endsWith(".kml"));
+  if (!kmlFile) return [];
+
+  const kmlContent = await zip.files[kmlFile].async("text");
+  const parser = new DOMParser();
+  const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
+
+  const extractedLines: LineSegment[] = [];
+  const coordinates = kmlDoc.querySelectorAll("coordinates");
+
+  coordinates.forEach((coord) => {
+    const coordText = coord.textContent?.trim();
+    if (!coordText) return;
+
+    const points = coordText
+      .split(/\s+/)
+      .map((point) => {
+        const [lng, lat] = point.split(",").map(Number);
+        return L.latLng(lat, lng);
+      })
+      .filter((p) => !isNaN(p.lat) && !isNaN(p.lng));
+
+    if (points.length >= 2) {
+      extractedLines.push(points);
+    }
+  });
+
+  return extractedLines;
+};
+
 // Cities in the coverage area with their region for geocoding
 const CITIES = [
   { value: "rawicz", label: "Rawicz", region: "powiat rawicki, wielkopolskie" },
@@ -39,6 +71,8 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
   const [isChecking, setIsChecking] = useState(false);
+  const [isMapDataLoading, setIsMapDataLoading] = useState(true);
+  const [mapDataError, setMapDataError] = useState<string | null>(null);
   const [availabilityResult, setAvailabilityResult] = useState<{
     available: boolean;
     message: string;
@@ -47,10 +81,27 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
   // Parse KMZ file and extract line segments
   useEffect(() => {
-    const loadKMZ = async () => {
-      try {
-        let arrayBuffer: ArrayBuffer;
+    let isMounted = true;
 
+    const loadKMZ = async () => {
+      setIsMapDataLoading(true);
+      setMapDataError(null);
+
+      const applyNetworkLines = (lines: LineSegment[]) => {
+        if (!isMounted) return;
+        setNetworkLines(lines);
+        setIsMapDataLoading(false);
+      };
+
+      const failMapData = (message: string, error: unknown) => {
+        console.error(message, error);
+        if (!isMounted) return;
+        setNetworkLines([]);
+        setMapDataError("Mapa zasięgu jest chwilowo niedostępna. Spróbuj ponownie za moment.");
+        setIsMapDataLoading(false);
+      };
+
+      try {
         try {
           // Fetch edge function directly to preserve binary data
           const edgeUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-network-map`;
@@ -61,89 +112,62 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
               'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             },
           });
+
+          if (!res.ok) {
+            throw new Error(`Edge function status ${res.status}`);
+          }
+
           const contentType = res.headers.get('content-type') || '';
           if (contentType.includes('application/json')) {
-            // Edge function returned JSON fallback flag
-            throw new Error('Edge function returned fallback');
+            throw new Error('Edge function returned JSON fallback');
           }
-          arrayBuffer = await res.arrayBuffer();
-        } catch {
-          // Fallback to public file
-          console.log('Using fallback public map file');
-          const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
-          arrayBuffer = await response.arrayBuffer();
+
+          const edgeBuffer = await res.arrayBuffer();
+          if (!edgeBuffer.byteLength) {
+            throw new Error('Empty KMZ payload from edge function');
+          }
+
+          const edgeLines = await parseKmzToLineSegments(edgeBuffer);
+          if (!edgeLines.length) {
+            throw new Error('No coordinates parsed from edge KMZ');
+          }
+
+          applyNetworkLines(edgeLines);
+          return;
+        } catch (edgeError) {
+          console.warn('Edge KMZ unavailable, using public fallback:', edgeError);
         }
-        
-        const zip = await JSZip.loadAsync(arrayBuffer);
-        
-        // Find KML file in the archive
-        const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
-        if (!kmlFile) return;
-        
-        const kmlContent = await zip.files[kmlFile].async("text");
-        const parser = new DOMParser();
-        const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
-        
-        // Extract all coordinates from lines and polygons
-        const extractedLines: LineSegment[] = [];
-        
-        // Get all coordinate elements
-        const coordinates = kmlDoc.querySelectorAll("coordinates");
-        coordinates.forEach(coord => {
-          const coordText = coord.textContent?.trim();
-          if (coordText) {
-            const points = coordText.split(/\s+/).map(point => {
-              const [lng, lat] = point.split(",").map(Number);
-              return L.latLng(lat, lng);
-            }).filter(p => !isNaN(p.lat) && !isNaN(p.lng));
-            
-            // Store lines with at least 2 points
-            if (points.length >= 2) {
-              extractedLines.push(points);
-            }
-          }
+
+        // Fallback to public file
+        const fallbackRes = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`, {
+          cache: 'no-store',
         });
-        
-        setNetworkLines(extractedLines);
-      } catch (error) {
-        console.error("Error loading KMZ:", error);
-        // Try fallback to public file
-        try {
-          const response = await fetch(`${import.meta.env.BASE_URL}maps/Schemat.kmz`);
-          const arrayBuffer = await response.arrayBuffer();
-          const zip = await JSZip.loadAsync(arrayBuffer);
-          
-          const kmlFile = Object.keys(zip.files).find(name => name.endsWith('.kml'));
-          if (!kmlFile) return;
-          
-          const kmlContent = await zip.files[kmlFile].async("text");
-          const parser = new DOMParser();
-          const kmlDoc = parser.parseFromString(kmlContent, "text/xml");
-          
-          const extractedLines: LineSegment[] = [];
-          const coordinates = kmlDoc.querySelectorAll("coordinates");
-          coordinates.forEach(coord => {
-            const coordText = coord.textContent?.trim();
-            if (coordText) {
-              const points = coordText.split(/\s+/).map(point => {
-                const [lng, lat] = point.split(",").map(Number);
-                return L.latLng(lat, lng);
-              }).filter(p => !isNaN(p.lat) && !isNaN(p.lng));
-              
-              if (points.length >= 2) {
-                extractedLines.push(points);
-              }
-            }
-          });
-          
-          setNetworkLines(extractedLines);
-        } catch (fallbackError) {
-          console.error("Fallback also failed:", fallbackError);
+
+        if (!fallbackRes.ok) {
+          throw new Error(`Public KMZ status ${fallbackRes.status}`);
         }
+
+        const fallbackBuffer = await fallbackRes.arrayBuffer();
+        if (!fallbackBuffer.byteLength) {
+          throw new Error('Empty KMZ payload from public file');
+        }
+
+        const fallbackLines = await parseKmzToLineSegments(fallbackBuffer);
+        if (!fallbackLines.length) {
+          throw new Error('No coordinates parsed from public KMZ');
+        }
+
+        applyNetworkLines(fallbackLines);
+      } catch (error) {
+        failMapData('Error loading KMZ:', error);
       }
     };
-    
+
     loadKMZ();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Initialize map
@@ -214,7 +238,22 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
   const checkAvailability = async () => {
     if (!address.trim() || !city) return;
-    
+
+    if (isMapDataLoading) {
+      setAvailabilityResult({
+        available: false,
+        message: "Trwa ładowanie mapy zasięgu. Spróbuj ponownie za chwilę.",
+      });
+      return;
+    }
+
+    if (mapDataError || networkLines.length === 0) {
+      setAvailabilityResult({
+        available: false,
+        message: "Mapa zasięgu jest chwilowo niedostępna. Spróbuj ponownie za moment lub zadzwoń do nas.",
+      });
+      return;
+    }
     setIsChecking(true);
     setAvailabilityResult(null);
     
@@ -347,7 +386,7 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
 
               <Button
                 onClick={checkAvailability}
-                disabled={isChecking || !address.trim() || !city}
+                disabled={isChecking || isMapDataLoading || !address.trim() || !city}
                 className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
               >
                 {isChecking ? (
@@ -362,6 +401,14 @@ export const AvailabilityMap = ({ className }: AvailabilityMapProps) => {
                   </>
                 )}
               </Button>
+
+              {isMapDataLoading && (
+                <p className="text-sm text-muted-foreground">Ładuję mapę zasięgu…</p>
+              )}
+
+              {!isMapDataLoading && mapDataError && (
+                <p className="text-sm text-destructive">{mapDataError}</p>
+              )}
 
               {/* Result */}
               {availabilityResult && (
