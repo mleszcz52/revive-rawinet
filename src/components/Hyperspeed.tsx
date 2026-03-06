@@ -1212,7 +1212,9 @@ class App {
       this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
       this.camera.updateProjectionMatrix();
     }
-    const delta = this.clock.getDelta();
+    const rawDelta = this.clock.getDelta();
+    // Clamp delta to prevent animation glitches after tab was inactive/background
+    const delta = Math.min(rawDelta, 1 / 30);
     this.render(delta);
     this.update(delta);
     requestAnimationFrame(this.tick);
