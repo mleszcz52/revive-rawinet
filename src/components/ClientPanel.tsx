@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import {
   Download, 
   Loader2, 
   LogOut,
-  Search,
   Wallet,
   AlertTriangle,
   CheckCircle,
@@ -19,7 +18,10 @@ import {
   Eye,
   EyeOff,
   Shield,
-  KeyRound
+  KeyRound,
+  Mail,
+  RefreshCw,
+  Smartphone
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,7 +79,6 @@ const getSession = (): Session | null => {
     
     const session = JSON.parse(data) as Session;
     
-    // Check if session expired
     if (new Date(session.expiresAt) < new Date()) {
       sessionStorage.removeItem(SESSION_KEY);
       return null;
@@ -91,6 +92,41 @@ const getSession = (): Session | null => {
 
 const clearSession = () => {
   sessionStorage.removeItem(SESSION_KEY);
+};
+
+// Generate device fingerprint
+const getDeviceFingerprint = (): string => {
+  const stored = localStorage.getItem('rawinet_device_fp');
+  if (stored) return stored;
+  
+  // Generate a simple fingerprint based on browser characteristics
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx?.fillText('fingerprint', 10, 10);
+  
+  const components = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+    canvas.toDataURL(),
+    navigator.hardwareConcurrency || '',
+    (navigator as any).deviceMemory || '',
+  ];
+  
+  // Simple hash
+  let hash = 0;
+  const str = components.join('|');
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  const fp = 'fp_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+  localStorage.setItem('rawinet_device_fp', fp);
+  return fp;
 };
 
 // Password validation
@@ -113,6 +149,8 @@ const validatePassword = (password: string): { valid: boolean; errors: string[] 
   return { valid: errors.length === 0, errors };
 };
 
+type LoginStep = 'credentials' | 'otp' | 'firstLoginSent';
+
 export const ClientPanel = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -120,6 +158,11 @@ export const ClientPanel = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [loginStep, setLoginStep] = useState<LoginStep>('credentials');
+  
+  // OTP state
+  const [otpCode, setOtpCode] = useState("");
+  const [otpResendCountdown, setOtpResendCountdown] = useState(0);
   
   // Password change state
   const [mustChangePassword, setMustChangePassword] = useState(false);
@@ -142,34 +185,36 @@ export const ClientPanel = () => {
     if (savedSession) {
       setSession(savedSession);
       setMustChangePassword(savedSession.mustChangePassword);
-      // Load client data if session exists and password was changed
       if (!savedSession.mustChangePassword) {
         loadClientDataByEmail(savedSession.email);
       }
     }
   }, []);
 
-  // Filter invoices: show all paid + current unpaid (payment_to within last 60 days)
+  // OTP resend countdown
+  useEffect(() => {
+    if (otpResendCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setOtpResendCountdown(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [otpResendCountdown]);
+
   const filterRelevantInvoices = (invoicesList: Invoice[]): Invoice[] => {
     const today = new Date();
     const cutoffDate = new Date();
-    cutoffDate.setDate(today.getDate() - 60); // 60 dni wstecz
+    cutoffDate.setDate(today.getDate() - 60);
 
     return invoicesList.filter((invoice) => {
-      // Zawsze pokazuj opłacone
       if (invoice.status === 'paid') return true;
-
-      // Dla nieopłaconych - sprawdź termin płatności
       const paymentDate = new Date(invoice.payment_to);
       return paymentDate >= cutoffDate;
     });
   };
 
-  // Get displayed invoices based on filter toggle
   const displayedInvoices = showAllInvoices ? allInvoices : filterRelevantInvoices(allInvoices);
   const hiddenCount = allInvoices.length - filterRelevantInvoices(allInvoices).length;
 
-  // Calculate balance from displayed invoices only
   const calculateBalance = () => {
     let totalDue = 0;
     let totalPaid = 0;
@@ -223,15 +268,39 @@ export const ClientPanel = () => {
     setIsLoading(true);
 
     try {
+      const deviceFingerprint = getDeviceFingerprint();
+      
       const { data, error } = await supabase.functions.invoke('fakturownia', {
         body: { 
           action: 'verifyPassword', 
           email,
-          password
+          password,
+          deviceFingerprint,
         }
       });
 
       if (error) throw error;
+
+      // First login — password was generated and sent
+      if (data.firstLogin) {
+        setLoginStep('firstLoginSent');
+        toast({
+          title: "Sprawdź email",
+          description: data.message,
+        });
+        return;
+      }
+
+      // New device — OTP required
+      if (data.requiresOtp) {
+        setLoginStep('otp');
+        setOtpResendCountdown(60);
+        toast({
+          title: "Weryfikacja urządzenia",
+          description: data.message,
+        });
+        return;
+      }
 
       if (data.locked) {
         toast({
@@ -263,10 +332,9 @@ export const ClientPanel = () => {
       saveSession(newSession);
       setSession(newSession);
       setMustChangePassword(data.mustChangePassword);
-      setCurrentPassword(password); // Save for password change form
+      setCurrentPassword(password);
 
       if (!data.mustChangePassword) {
-        // Load client data
         await loadClientDataByEmail(email);
         toast({
           title: "Zalogowano",
@@ -282,7 +350,131 @@ export const ClientPanel = () => {
       });
     } finally {
       setIsLoading(false);
-      setPassword(""); // Clear password from memory
+      setPassword("");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      toast({
+        title: "Błąd",
+        description: "Wprowadź 6-cyfrowy kod weryfikacyjny",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const deviceFingerprint = getDeviceFingerprint();
+
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: {
+          action: 'verifyOtp',
+          email,
+          otpCode,
+          deviceFingerprint,
+          deviceName: navigator.userAgent.substring(0, 100),
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.expired) {
+        toast({
+          title: "Kod wygasł",
+          description: data.message,
+          variant: "destructive",
+        });
+        setLoginStep('credentials');
+        setOtpCode("");
+        return;
+      }
+
+      if (!data.valid) {
+        toast({
+          title: "Błędny kod",
+          description: data.message,
+          variant: "destructive",
+        });
+        setOtpCode("");
+        return;
+      }
+
+      // OTP verified — login
+      const newSession: Session = {
+        email: email.toLowerCase().trim(),
+        clientName: data.clientName,
+        sessionToken: data.sessionToken,
+        expiresAt: data.expiresAt,
+        mustChangePassword: data.mustChangePassword
+      };
+
+      saveSession(newSession);
+      setSession(newSession);
+      setMustChangePassword(data.mustChangePassword);
+      setLoginStep('credentials');
+      setOtpCode("");
+
+      if (!data.mustChangePassword) {
+        await loadClientDataByEmail(email);
+        toast({
+          title: "Zalogowano",
+          description: "Urządzenie zostało zweryfikowane i zapamiętane.",
+        });
+      }
+    } catch (error) {
+      console.error('OTP verify error:', error);
+      toast({
+        title: "Błąd",
+        description: "Wystąpił błąd. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (otpResendCountdown > 0) return;
+
+    setIsLoading(true);
+    try {
+      const deviceFingerprint = getDeviceFingerprint();
+
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: {
+          action: 'resendOtp',
+          email,
+          deviceFingerprint,
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setOtpResendCountdown(60);
+        toast({
+          title: "Kod wysłany",
+          description: "Nowy kod weryfikacyjny został wysłany na email.",
+        });
+      } else {
+        toast({
+          title: "Błąd",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      toast({
+        title: "Błąd",
+        description: "Nie udało się wysłać kodu.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -318,12 +510,15 @@ export const ClientPanel = () => {
     setIsChangingPassword(true);
 
     try {
+      const deviceFingerprint = getDeviceFingerprint();
+
       const { data, error } = await supabase.functions.invoke('fakturownia', {
         body: { 
           action: 'changePassword', 
           email: session?.email,
           password: currentPassword,
-          newPassword
+          newPassword,
+          deviceFingerprint,
         }
       });
 
@@ -338,13 +533,11 @@ export const ClientPanel = () => {
         return;
       }
 
-      // Update session
       const updatedSession = { ...session!, mustChangePassword: false };
       saveSession(updatedSession);
       setSession(updatedSession);
       setMustChangePassword(false);
 
-      // Clear password fields
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -354,7 +547,6 @@ export const ClientPanel = () => {
         description: "Twoje hasło zostało pomyślnie zmienione",
       });
 
-      // Load client data
       await loadClientDataByEmail(session!.email);
     } catch (error) {
       console.error('Password change error:', error);
@@ -429,6 +621,8 @@ export const ClientPanel = () => {
     setActiveTab("info");
     setShowAllInvoices(false);
     setMustChangePassword(false);
+    setLoginStep('credentials');
+    setOtpCode("");
   };
 
   const getStatusBadge = (status: string) => {
@@ -444,7 +638,137 @@ export const ClientPanel = () => {
 
   const passwordValidation = validatePassword(newPassword);
 
-  // Password change form (shown after first login with generated password)
+  // ============= OTP Verification Step =============
+  if (loginStep === 'otp') {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Smartphone className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Weryfikacja urządzenia</h2>
+            <p className="text-muted-foreground mt-2">
+              Wprowadź 6-cyfrowy kod wysłany na <strong>{email}</strong>
+            </p>
+          </div>
+
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <Shield className="w-5 h-5 text-primary mt-0.5" />
+              <div className="text-sm text-muted-foreground">
+                <p>Wykryliśmy logowanie z nowego urządzenia. Dla bezpieczeństwa Twojego konta, potwierdź swoją tożsamość kodem z emaila.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="otpCode">Kod weryfikacyjny</Label>
+              <Input
+                id="otpCode"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                onKeyDown={(e) => e.key === "Enter" && otpCode.length === 6 && handleVerifyOtp()}
+                className="text-center text-2xl tracking-[0.5em] font-mono"
+              />
+            </div>
+
+            <Button 
+              onClick={handleVerifyOtp} 
+              disabled={isLoading || otpCode.length !== 6}
+              className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Weryfikuję...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Zweryfikuj
+                </>
+              )}
+            </Button>
+
+            <div className="flex items-center justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResendOtp}
+                disabled={otpResendCountdown > 0 || isLoading}
+                className="text-muted-foreground"
+              >
+                <RefreshCw className="w-4 h-4 mr-1" />
+                {otpResendCountdown > 0 
+                  ? `Wyślij ponownie (${otpResendCountdown}s)` 
+                  : 'Wyślij ponownie'
+                }
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setLoginStep('credentials');
+                  setOtpCode("");
+                }}
+                className="text-muted-foreground"
+              >
+                Anuluj
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============= First Login — Password Sent =============
+  if (loginStep === 'firstLoginSent') {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Sprawdź email</h2>
+            <p className="text-muted-foreground mt-2">
+              Hasło zostało wygenerowane i wysłane na adres <strong>{email}</strong>
+            </p>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-green-700">Hasło wysłane!</p>
+                <p className="text-green-600 mt-1">
+                  Sprawdź swoją skrzynkę pocztową (również folder spam) i użyj otrzymanego hasła do zalogowania.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Button 
+            onClick={() => setLoginStep('credentials')}
+            className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
+          >
+            <Lock className="w-4 h-4 mr-2" />
+            Zaloguj się z hasłem
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Password change form
   if (session && mustChangePassword) {
     return (
       <div className="max-w-md mx-auto">
@@ -492,7 +816,6 @@ export const ClientPanel = () => {
                 </button>
               </div>
               
-              {/* Password requirements */}
               <div className="mt-2 space-y-1">
                 {['Minimum 8 znaków', 'Co najmniej 1 wielka litera', 'Co najmniej 1 cyfra', 'Co najmniej 1 znak specjalny'].map((req, i) => {
                   const checks = [
@@ -625,6 +948,10 @@ export const ClientPanel = () => {
                 </>
               )}
             </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              Pierwszy raz? Wpisz swój email i dowolne hasło — otrzymasz dane logowania na email.
+            </p>
           </div>
 
           <div className="flex items-center gap-2 justify-center mt-6 text-xs text-muted-foreground">
@@ -789,9 +1116,7 @@ export const ClientPanel = () => {
                     key={invoice.id}
                     className="p-4 bg-muted/30 rounded-xl border border-border/50"
                   >
-                    {/* Mobile-first: stack vertically, then row on larger screens */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      {/* Invoice info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
                           <span className="font-semibold text-foreground">{invoice.number}</span>
@@ -804,7 +1129,6 @@ export const ClientPanel = () => {
                         </div>
                       </div>
 
-                      {/* Price and actions row on mobile */}
                       <div className="flex items-center justify-between sm:justify-end gap-4">
                         <div className="text-left sm:text-right">
                           <p className="font-bold text-foreground">{invoice.price_gross} {invoice.currency}</p>
@@ -835,7 +1159,6 @@ export const ClientPanel = () => {
                   </div>
                 ))}
 
-                {/* Toggle to show/hide old invoices */}
                 {hiddenCount > 0 && (
                   <div className="text-center pt-2">
                     <Button
