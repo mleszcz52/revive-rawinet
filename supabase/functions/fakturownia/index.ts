@@ -139,6 +139,19 @@ const PRIMARY_COLOR = 'hsl(195, 85%, 45%)';
 const FOREGROUND_COLOR = 'hsl(220, 30%, 15%)';
 const MUTED_COLOR = 'hsl(220, 15%, 45%)';
 
+function getEmailFooterHtml(): string {
+  return `
+    <div style="background: hsl(210, 20%, 96%); border-radius: 12px; padding: 24px; margin-top: 24px; text-align: center;">
+      <img src="${LOGO_URL}" alt="RAWI-NET" style="height: 32px; margin-bottom: 12px;" />
+      <p style="color: ${FOREGROUND_COLOR}; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Rawi-Net Sp. z o.o.</p>
+      <p style="color: ${MUTED_COLOR}; font-size: 13px; margin: 0 0 4px 0;">ul. Mikołajewicza 8B/1, 63-900 Rawicz</p>
+      <p style="color: ${MUTED_COLOR}; font-size: 13px; margin: 0 0 4px 0;">📞 Biuro: <a href="tel:+48505051376" style="color: ${PRIMARY_COLOR}; text-decoration: none;">505 051 376</a></p>
+      <p style="color: ${MUTED_COLOR}; font-size: 13px; margin: 0 0 4px 0;">✉️ <a href="mailto:biuro@rawinet.pl" style="color: ${PRIMARY_COLOR}; text-decoration: none;">biuro@rawinet.pl</a></p>
+      <p style="color: ${MUTED_COLOR}; font-size: 13px; margin: 0;">📅 pon–pt 8:00 – 16:00</p>
+    </div>
+  `;
+}
+
 function getPasswordEmailHtml(password: string): string {
   return `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
@@ -154,9 +167,9 @@ function getPasswordEmailHtml(password: string): string {
         </div>
         <p style="color: ${MUTED_COLOR}; font-size: 14px;">Po pierwszym logowaniu zostaniesz poproszony o zmianę hasła na własne.</p>
         <p style="color: hsl(0, 84%, 60%); font-size: 14px; font-weight: 500;">⚠️ Nie udostępniaj nikomu tego hasła.</p>
-        <hr style="border: none; border-top: 1px solid hsl(210, 20%, 88%); margin: 20px 0;">
-        <p style="color: ${MUTED_COLOR}; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
+        ${getEmailFooterHtml()}
       </div>
+    </div>
     </div>
   `;
 }
@@ -176,9 +189,9 @@ function getOtpEmailHtml(code: string): string {
         </div>
         <p style="color: ${MUTED_COLOR}; font-size: 14px;">Kod jest ważny przez <strong>${OTP_EXPIRY_MINUTES} minut</strong>.</p>
         <p style="color: hsl(0, 84%, 60%); font-size: 14px; font-weight: 500;">Jeśli to nie Ty — zignoruj tę wiadomość i zmień hasło.</p>
-        <hr style="border: none; border-top: 1px solid hsl(210, 20%, 88%); margin: 20px 0;">
-        <p style="color: ${MUTED_COLOR}; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
+        ${getEmailFooterHtml()}
       </div>
+    </div>
     </div>
   `;
 }
