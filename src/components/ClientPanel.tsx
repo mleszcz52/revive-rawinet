@@ -377,6 +377,7 @@ export const ClientPanel = () => {
           otpCode,
           deviceFingerprint,
           deviceName: navigator.userAgent.substring(0, 100),
+          trustDevice,
         }
       });
 
