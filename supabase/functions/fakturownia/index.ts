@@ -614,14 +614,16 @@ serve(async (req) => {
         .update({ used: true })
         .eq('id', otpRecord.id);
 
-      // Register this device as trusted
-      await supabaseAdmin.from('client_devices').upsert({
-        client_email: normalizedEmail,
-        device_fingerprint: deviceFingerprint,
-        device_name: body.deviceName || null,
-        last_seen_at: new Date().toISOString(),
-        is_trusted: true,
-      }, { onConflict: 'client_email,device_fingerprint' });
+      // Register this device only if user chose to trust it
+      if (body.trustDevice) {
+        await supabaseAdmin.from('client_devices').upsert({
+          client_email: normalizedEmail,
+          device_fingerprint: deviceFingerprint,
+          device_name: body.deviceName || null,
+          last_seen_at: new Date().toISOString(),
+          is_trusted: true,
+        }, { onConflict: 'client_email,device_fingerprint' });
+      }
 
       // Get credentials for session
       const { data: credentials } = await supabaseAdmin
