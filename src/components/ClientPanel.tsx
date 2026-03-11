@@ -681,6 +681,19 @@ export const ClientPanel = () => {
               />
             </div>
 
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors">
+              <input
+                type="checkbox"
+                checked={trustDevice}
+                onChange={(e) => setTrustDevice(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <div className="text-sm">
+                <span className="font-medium text-foreground">Zapamiętaj to urządzenie</span>
+                <p className="text-muted-foreground text-xs mt-0.5">Kolejne logowania z tego urządzenia nie będą wymagały kodu weryfikacyjnego</p>
+              </div>
+            </label>
+
             <Button 
               onClick={handleVerifyOtp} 
               disabled={isLoading || otpCode.length !== 6}
