@@ -163,7 +163,8 @@ export const ClientPanel = () => {
   // OTP state
   const [otpCode, setOtpCode] = useState("");
   const [otpResendCountdown, setOtpResendCountdown] = useState(0);
-  
+  const [trustDevice, setTrustDevice] = useState(false);
+
   // Password change state
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
