@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ClientPanel } from "@/components/ClientPanel";
 import { SpeedTestSection } from "@/components/SpeedTestSection";
-import { HelpCircle, Phone, Mail } from "lucide-react";
+import { HelpCircle, Phone, Mail, Shield, Smartphone, KeyRound } from "lucide-react";
 import { DarkVeil } from "@/components/DarkVeil";
 
 const faqItems = [
