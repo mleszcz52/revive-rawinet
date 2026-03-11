@@ -89,6 +89,69 @@ export type Database = {
         }
         Relationships: []
       }
+      client_devices: {
+        Row: {
+          client_email: string
+          device_fingerprint: string
+          device_name: string | null
+          first_seen_at: string | null
+          id: string
+          is_trusted: boolean | null
+          last_seen_at: string | null
+        }
+        Insert: {
+          client_email: string
+          device_fingerprint: string
+          device_name?: string | null
+          first_seen_at?: string | null
+          id?: string
+          is_trusted?: boolean | null
+          last_seen_at?: string | null
+        }
+        Update: {
+          client_email?: string
+          device_fingerprint?: string
+          device_name?: string | null
+          first_seen_at?: string | null
+          id?: string
+          is_trusted?: boolean | null
+          last_seen_at?: string | null
+        }
+        Relationships: []
+      }
+      client_otp_codes: {
+        Row: {
+          attempts: number | null
+          client_email: string
+          code: string
+          created_at: string | null
+          device_fingerprint: string | null
+          expires_at: string
+          id: string
+          used: boolean | null
+        }
+        Insert: {
+          attempts?: number | null
+          client_email: string
+          code: string
+          created_at?: string | null
+          device_fingerprint?: string | null
+          expires_at: string
+          id?: string
+          used?: boolean | null
+        }
+        Update: {
+          attempts?: number | null
+          client_email?: string
+          code?: string
+          created_at?: string | null
+          device_fingerprint?: string | null
+          expires_at?: string
+          id?: string
+          used?: boolean | null
+        }
+        Relationships: []
+      }
       login_attempts: {
         Row: {
           attempted_at: string | null
