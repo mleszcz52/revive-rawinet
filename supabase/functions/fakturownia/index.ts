@@ -189,9 +189,9 @@ function getOtpEmailHtml(code: string): string {
         </div>
         <p style="color: ${MUTED_COLOR}; font-size: 14px;">Kod jest ważny przez <strong>${OTP_EXPIRY_MINUTES} minut</strong>.</p>
         <p style="color: hsl(0, 84%, 60%); font-size: 14px; font-weight: 500;">Jeśli to nie Ty — zignoruj tę wiadomość i zmień hasło.</p>
-        <hr style="border: none; border-top: 1px solid hsl(210, 20%, 88%); margin: 20px 0;">
-        <p style="color: ${MUTED_COLOR}; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
+        ${getEmailFooterHtml()}
       </div>
+    </div>
     </div>
   `;
 }
