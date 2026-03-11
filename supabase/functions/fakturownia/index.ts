@@ -167,9 +167,9 @@ function getPasswordEmailHtml(password: string): string {
         </div>
         <p style="color: ${MUTED_COLOR}; font-size: 14px;">Po pierwszym logowaniu zostaniesz poproszony o zmianę hasła na własne.</p>
         <p style="color: hsl(0, 84%, 60%); font-size: 14px; font-weight: 500;">⚠️ Nie udostępniaj nikomu tego hasła.</p>
-        <hr style="border: none; border-top: 1px solid hsl(210, 20%, 88%); margin: 20px 0;">
-        <p style="color: ${MUTED_COLOR}; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
+        ${getEmailFooterHtml()}
       </div>
+    </div>
     </div>
   `;
 }
