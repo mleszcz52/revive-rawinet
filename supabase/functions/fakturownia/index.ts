@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { hashSync, compareSync } from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
-import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,10 +15,8 @@ const PASSWORD_MIN_LENGTH = 8;
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 
-// SMTP config for home.pl
-const SMTP_HOST = "smtp.home.pl";
-const SMTP_PORT = 465;
-const SMTP_FROM = "automat@rawinet.pl";
+// Email config
+const EMAIL_FROM = "automat@rawinet.pl";
 
 // Helper function to safely parse JSON response
 async function safeJsonParse(response: Response, url: string) {
@@ -97,34 +94,37 @@ function generateSessionToken(): string {
   return token;
 }
 
-// Send email via SMTP (home.pl)
+// Send email via Resend HTTP API
 async function sendEmail(to: string, subject: string, htmlBody: string): Promise<boolean> {
   try {
-    const smtpPassword = Deno.env.get('SMTP_PASSWORD');
-    if (!smtpPassword) {
-      console.error('SMTP_PASSWORD not configured');
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendApiKey) {
+      console.error('RESEND_API_KEY not configured');
       return false;
     }
 
-    const client = new SmtpClient();
-    
-    await client.connectTLS({
-      hostname: SMTP_HOST,
-      port: SMTP_PORT,
-      username: SMTP_FROM,
-      password: smtpPassword,
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: `RAWI-NET <${EMAIL_FROM}>`,
+        to: [to],
+        subject: subject,
+        html: htmlBody,
+      }),
     });
 
-    await client.send({
-      from: SMTP_FROM,
-      to: to,
-      subject: subject,
-      content: htmlBody,
-      html: htmlBody,
-    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Resend API error [${response.status}]: ${errorText}`);
+      return false;
+    }
 
-    await client.close();
-    console.log(`Email sent to ${to}: ${subject}`);
+    const result = await response.json();
+    console.log(`Email sent to ${to}: ${subject} (id: ${result.id})`);
     return true;
   } catch (error) {
     console.error('Failed to send email:', error);
