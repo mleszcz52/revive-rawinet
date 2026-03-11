@@ -15,10 +15,8 @@ const PASSWORD_MIN_LENGTH = 8;
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 
-// SMTP config for home.pl
-const SMTP_HOST = "smtp.home.pl";
-const SMTP_PORT = 465;
-const SMTP_FROM = "automat@rawinet.pl";
+// Email config
+const EMAIL_FROM = "automat@rawinet.pl";
 
 // Helper function to safely parse JSON response
 async function safeJsonParse(response: Response, url: string) {
