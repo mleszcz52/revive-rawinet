@@ -46,6 +46,13 @@ const Subscriber = () => {
           </div>
         </section>
 
+        {/* Client Panel */}
+        <section className="py-16 lg:py-24">
+          <div className="container mx-auto px-4 lg:px-8">
+            <ClientPanel />
+          </div>
+        </section>
+
         {/* Two-Step Verification Info */}
         <section className="py-12 lg:py-16 bg-muted/20">
           <div className="container mx-auto px-4 lg:px-8">
@@ -86,13 +93,6 @@ const Subscriber = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Client Panel - at the top */}
-        <section className="py-16 lg:py-24">
-          <div className="container mx-auto px-4 lg:px-8">
-            <ClientPanel />
           </div>
         </section>
 
