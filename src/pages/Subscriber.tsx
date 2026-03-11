@@ -46,6 +46,49 @@ const Subscriber = () => {
           </div>
         </section>
 
+        {/* Two-Step Verification Info */}
+        <section className="py-12 lg:py-16 bg-muted/20">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-glow">
+                  <Shield className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground">Dwustopniowa weryfikacja</h2>
+              </div>
+              <p className="text-muted-foreground mb-8">
+                Twoje konto jest chronione dwustopniową weryfikacją. Oto jak działa proces logowania:
+              </p>
+              <div className="grid sm:grid-cols-3 gap-6">
+                <div className="bg-card rounded-xl border border-border p-6 relative">
+                  <div className="absolute -top-3 left-4 w-7 h-7 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground shadow-glow">1</div>
+                  <KeyRound className="w-8 h-8 text-primary mb-3 mt-2" />
+                  <h3 className="font-semibold text-foreground mb-2">Pierwsze logowanie</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Podaj adres e-mail z umowy. Otrzymasz automatycznie wygenerowane hasło tymczasowe na swoją skrzynkę.
+                  </p>
+                </div>
+                <div className="bg-card rounded-xl border border-border p-6 relative">
+                  <div className="absolute -top-3 left-4 w-7 h-7 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground shadow-glow">2</div>
+                  <Smartphone className="w-8 h-8 text-primary mb-3 mt-2" />
+                  <h3 className="font-semibold text-foreground mb-2">Weryfikacja urządzenia</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Przy logowaniu z nowego urządzenia otrzymasz 6-cyfrowy kod weryfikacyjny na e-mail. Wpisz go, aby potwierdzić swoją tożsamość.
+                  </p>
+                </div>
+                <div className="bg-card rounded-xl border border-border p-6 relative">
+                  <div className="absolute -top-3 left-4 w-7 h-7 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground shadow-glow">3</div>
+                  <Shield className="w-8 h-8 text-primary mb-3 mt-2" />
+                  <h3 className="font-semibold text-foreground mb-2">Bezpieczny dostęp</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Zaufane urządzenia są zapamiętywane — kolejne logowania z tego samego urządzenia nie wymagają kodu OTP.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Client Panel - at the top */}
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
