@@ -88,7 +88,7 @@ const Subscriber = () => {
                   <Shield className="w-8 h-8 text-primary mb-3 mt-2" />
                   <h3 className="font-semibold text-foreground mb-2">Bezpieczny dostęp</h3>
                   <p className="text-sm text-muted-foreground">
-                    Zaufane urządzenia są zapamiętywane — kolejne logowania z tego samego urządzenia nie wymagają kodu OTP.
+                    Po weryfikacji możesz zaznaczyć opcję „Zapamiętaj to urządzenie" — kolejne logowania nie będą wymagały kodu OTP.
                   </p>
                 </div>
               </div>

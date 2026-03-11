@@ -163,7 +163,8 @@ export const ClientPanel = () => {
   // OTP state
   const [otpCode, setOtpCode] = useState("");
   const [otpResendCountdown, setOtpResendCountdown] = useState(0);
-  
+  const [trustDevice, setTrustDevice] = useState(false);
+
   // Password change state
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -376,6 +377,7 @@ export const ClientPanel = () => {
           otpCode,
           deviceFingerprint,
           deviceName: navigator.userAgent.substring(0, 100),
+          trustDevice,
         }
       });
 
@@ -416,6 +418,7 @@ export const ClientPanel = () => {
       setMustChangePassword(data.mustChangePassword);
       setLoginStep('credentials');
       setOtpCode("");
+      setTrustDevice(false);
 
       if (!data.mustChangePassword) {
         await loadClientDataByEmail(email);
@@ -677,6 +680,19 @@ export const ClientPanel = () => {
                 className="text-center text-2xl tracking-[0.5em] font-mono"
               />
             </div>
+
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors">
+              <input
+                type="checkbox"
+                checked={trustDevice}
+                onChange={(e) => setTrustDevice(e.target.checked)}
+                className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <div className="text-sm">
+                <span className="font-medium text-foreground">Zapamiętaj to urządzenie</span>
+                <p className="text-muted-foreground text-xs mt-0.5">Kolejne logowania z tego urządzenia nie będą wymagały kodu weryfikacyjnego</p>
+              </div>
+            </label>
 
             <Button 
               onClick={handleVerifyOtp} 
