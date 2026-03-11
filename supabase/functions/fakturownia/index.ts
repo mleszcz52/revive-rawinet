@@ -133,23 +133,29 @@ async function sendEmail(to: string, subject: string, htmlBody: string): Promise
 }
 
 // Email templates
+const LOGO_URL = 'https://cqbwkhhefnurmddwazsk.supabase.co/storage/v1/object/public/email-assets/logo-rawinet.png';
+const EMAIL_HEADER_BG = 'linear-gradient(135deg, hsl(220, 50%, 15%) 0%, hsl(220, 45%, 25%) 50%, hsl(195, 60%, 30%) 100%)';
+const PRIMARY_COLOR = 'hsl(195, 85%, 45%)';
+const FOREGROUND_COLOR = 'hsl(220, 30%, 15%)';
+const MUTED_COLOR = 'hsl(220, 15%, 45%)';
+
 function getPasswordEmailHtml(password: string): string {
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">RAWI-NET</h1>
-        <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0;">Panel Klienta</p>
+    <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+      <div style="background: ${EMAIL_HEADER_BG}; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+        <img src="${LOGO_URL}" alt="RAWI-NET" style="height: 48px; margin-bottom: 12px;" />
+        <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 14px;">Panel Klienta</p>
       </div>
-      <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-        <h2 style="color: #1f2937; margin-top: 0;">Twoje dane logowania</h2>
-        <p style="color: #6b7280;">Twoje hasło do Panelu Klienta RAWI-NET zostało wygenerowane:</p>
-        <div style="background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">
-          <p style="font-size: 24px; font-weight: bold; color: #1f2937; letter-spacing: 2px; margin: 0;">${password}</p>
+      <div style="background: #ffffff; padding: 30px; border: 1px solid hsl(210, 20%, 88%); border-top: none; border-radius: 0 0 12px 12px;">
+        <h2 style="color: ${FOREGROUND_COLOR}; margin-top: 0;">Twoje dane logowania</h2>
+        <p style="color: ${MUTED_COLOR};">Twoje hasło do Panelu Klienta RAWI-NET zostało wygenerowane:</p>
+        <div style="background: hsl(210, 20%, 96%); border: 2px dashed hsl(210, 20%, 82%); border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
+          <p style="font-size: 24px; font-weight: bold; color: ${FOREGROUND_COLOR}; letter-spacing: 2px; margin: 0;">${password}</p>
         </div>
-        <p style="color: #6b7280; font-size: 14px;">Po pierwszym logowaniu zostaniesz poproszony o zmianę hasła na własne.</p>
-        <p style="color: #ef4444; font-size: 14px; font-weight: 500;">⚠️ Nie udostępniaj nikomu tego hasła.</p>
-        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-        <p style="color: #9ca3af; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
+        <p style="color: ${MUTED_COLOR}; font-size: 14px;">Po pierwszym logowaniu zostaniesz poproszony o zmianę hasła na własne.</p>
+        <p style="color: hsl(0, 84%, 60%); font-size: 14px; font-weight: 500;">⚠️ Nie udostępniaj nikomu tego hasła.</p>
+        <hr style="border: none; border-top: 1px solid hsl(210, 20%, 88%); margin: 20px 0;">
+        <p style="color: ${MUTED_COLOR}; font-size: 12px; text-align: center;">RAWI-NET — Twój dostawca internetu</p>
       </div>
     </div>
   `;
