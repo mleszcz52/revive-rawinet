@@ -418,6 +418,7 @@ export const ClientPanel = () => {
       setMustChangePassword(data.mustChangePassword);
       setLoginStep('credentials');
       setOtpCode("");
+      setTrustDevice(false);
 
       if (!data.mustChangePassword) {
         await loadClientDataByEmail(email);
