@@ -731,6 +731,73 @@ serve(async (req) => {
       );
     }
 
+    // ============= Reset Password (Forgot Password) =============
+    if (action === 'resetPassword') {
+      if (!email) {
+        return new Response(
+          JSON.stringify({ error: 'Email jest wymagany' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedEmail = email.toLowerCase().trim();
+
+      // Check if credentials exist
+      const { data: credentials } = await supabaseAdmin
+        .from('client_credentials')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+
+      if (!credentials) {
+        // Don't reveal whether account exists — show generic success
+        return new Response(
+          JSON.stringify({ success: true, message: 'Jeśli konto istnieje, nowe hasło zostanie wysłane na podany adres email.' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Check if account is locked (rate limit protection)
+      if (credentials.locked_until && new Date(credentials.locked_until) > new Date()) {
+        return new Response(
+          JSON.stringify({ success: true, message: 'Jeśli konto istnieje, nowe hasło zostanie wysłane na podany adres email.' }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Generate new temporary password
+      const newTempPassword = generateSecurePassword();
+      const newPasswordHash = hashSync(newTempPassword);
+
+      await supabaseAdmin
+        .from('client_credentials')
+        .update({
+          password_hash: newPasswordHash,
+          must_change_password: true,
+          temp_password: newTempPassword,
+          failed_attempts: 0,
+          locked_until: null,
+        })
+        .eq('id', credentials.id);
+
+      // Send new password via email
+      const emailSent = await sendEmail(
+        normalizedEmail,
+        'RAWI-NET — Resetowanie hasła',
+        getPasswordEmailHtml(newTempPassword)
+      );
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: emailSent 
+            ? 'Jeśli konto istnieje, nowe hasło zostanie wysłane na podany adres email.'
+            : 'Nie udało się wysłać emaila. Skontaktuj się z biurem.'
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (action === 'changePassword') {
       if (!email || !password || !newPassword) {
         return new Response(
