@@ -612,6 +612,49 @@ export const ClientPanel = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Błąd",
+        description: "Wprowadź adres email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: { action: 'resetPassword', email }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setLoginStep('forgotPasswordSent');
+        toast({
+          title: "Hasło zresetowane",
+          description: data.message,
+        });
+      } else {
+        toast({
+          title: "Błąd",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      toast({
+        title: "Błąd",
+        description: "Wystąpił błąd. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     clearSession();
     setSession(null);
