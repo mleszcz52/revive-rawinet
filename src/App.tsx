@@ -15,6 +15,7 @@ import Subscriber from "./pages/Subscriber";
 import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WhyUs from "./pages/WhyUs";
+import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
