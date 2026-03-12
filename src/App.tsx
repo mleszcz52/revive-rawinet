@@ -38,6 +38,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/polityka-prywatnosci" element={<PrivacyPolicy />} />
           <Route path="/dlaczego-my" element={<WhyUs />} />
+          <Route path="/polityka-cookies" element={<CookiePolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
