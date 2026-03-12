@@ -149,7 +149,7 @@ const validatePassword = (password: string): { valid: boolean; errors: string[] 
   return { valid: errors.length === 0, errors };
 };
 
-type LoginStep = 'credentials' | 'otp' | 'firstLoginSent';
+type LoginStep = 'credentials' | 'otp' | 'firstLoginSent' | 'forgotPassword' | 'forgotPasswordSent';
 
 export const ClientPanel = () => {
   const { toast } = useToast();
@@ -612,6 +612,49 @@ export const ClientPanel = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({
+        title: "Błąd",
+        description: "Wprowadź adres email",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fakturownia', {
+        body: { action: 'resetPassword', email }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setLoginStep('forgotPasswordSent');
+        toast({
+          title: "Hasło zresetowane",
+          description: data.message,
+        });
+      } else {
+        toast({
+          title: "Błąd",
+          description: data.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      toast({
+        title: "Błąd",
+        description: "Wystąpił błąd. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     clearSession();
     setSession(null);
@@ -747,7 +790,105 @@ export const ClientPanel = () => {
     );
   }
 
-  // ============= First Login — Password Sent =============
+  // ============= Forgot Password Step =============
+  if (loginStep === 'forgotPassword') {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <KeyRound className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Resetowanie hasła</h2>
+            <p className="text-muted-foreground mt-2">
+              Podaj adres email powiązany z kontem. Wyślemy nowe hasło tymczasowe.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="resetEmail">Adres email</Label>
+              <Input
+                id="resetEmail"
+                type="email"
+                placeholder="twoj@email.pl"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleForgotPassword()}
+              />
+            </div>
+
+            <Button 
+              onClick={handleForgotPassword} 
+              disabled={isLoading || !email}
+              className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Wysyłam...
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Wyślij nowe hasło
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="ghost"
+              onClick={() => setLoginStep('credentials')}
+              className="w-full text-muted-foreground"
+            >
+              Wróć do logowania
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============= Forgot Password — Sent =============
+  if (loginStep === 'forgotPasswordSent') {
+    return (
+      <div className="max-w-md mx-auto">
+        <div className="bg-card rounded-2xl border border-border p-8 shadow-card">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground">Sprawdź email</h2>
+            <p className="text-muted-foreground mt-2">
+              Nowe hasło tymczasowe zostało wysłane na adres <strong>{email}</strong>
+            </p>
+          </div>
+
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-medium text-green-700">Hasło wysłane!</p>
+                <p className="text-green-600 mt-1">
+                  Sprawdź skrzynkę pocztową (również folder spam) i zaloguj się nowym hasłem. Po zalogowaniu będzie wymagana zmiana hasła.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Button 
+            onClick={() => setLoginStep('credentials')}
+            className="w-full gradient-primary text-primary-foreground font-semibold shadow-glow"
+          >
+            <Lock className="w-4 h-4 mr-2" />
+            Zaloguj się
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+
   if (loginStep === 'firstLoginSent') {
     return (
       <div className="max-w-md mx-auto">
@@ -967,9 +1108,18 @@ export const ClientPanel = () => {
               )}
             </Button>
 
-            <p className="text-xs text-center text-muted-foreground">
-              Pierwszy raz? Wpisz swój email i dowolne hasło — otrzymasz dane logowania na email.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Pierwszy raz? Wpisz email i dowolne hasło.
+              </p>
+              <button
+                type="button"
+                onClick={() => setLoginStep('forgotPassword')}
+                className="text-xs text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
+              >
+                Zapomniałeś hasła?
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 justify-center mt-6 text-xs text-muted-foreground">
