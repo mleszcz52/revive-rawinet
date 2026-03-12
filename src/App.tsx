@@ -16,6 +16,7 @@ import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WhyUs from "./pages/WhyUs";
 import CookiePolicy from "./pages/CookiePolicy";
+import DataProtection from "./pages/DataProtection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/polityka-prywatnosci" element={<PrivacyPolicy />} />
           <Route path="/dlaczego-my" element={<WhyUs />} />
           <Route path="/polityka-cookies" element={<CookiePolicy />} />
+          <Route path="/ochrona-danych" element={<DataProtection />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
