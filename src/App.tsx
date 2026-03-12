@@ -16,6 +16,7 @@ import Admin from "./pages/Admin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WhyUs from "./pages/WhyUs";
 import CookiePolicy from "./pages/CookiePolicy";
+import DataProtection from "./pages/DataProtection";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
