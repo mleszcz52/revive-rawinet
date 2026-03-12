@@ -45,7 +45,7 @@ export const CookieConsent = () => {
                 Używamy plików cookies, aby zapewnić najlepszą jakość korzystania z naszej strony. 
                 Kontynuując przeglądanie, wyrażasz zgodę na ich użycie.{" "}
                 <a 
-                  href="/polityka-prywatnosci" 
+                  href="/polityka-cookies" 
                   className="text-primary hover:underline"
                 >
                   Dowiedz się więcej
