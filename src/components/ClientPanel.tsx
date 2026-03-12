@@ -424,7 +424,9 @@ export const ClientPanel = () => {
         await loadClientDataByEmail(email);
         toast({
           title: "Zalogowano",
-          description: "Urządzenie zostało zweryfikowane i zapamiętane.",
+          description: trustDevice 
+            ? "Urządzenie zostało zweryfikowane i zapamiętane." 
+            : "Urządzenie zostało zweryfikowane. Przy następnym logowaniu kod będzie wymagany ponownie.",
         });
       }
     } catch (error) {
