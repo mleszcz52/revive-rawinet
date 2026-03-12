@@ -149,7 +149,7 @@ const validatePassword = (password: string): { valid: boolean; errors: string[] 
   return { valid: errors.length === 0, errors };
 };
 
-type LoginStep = 'credentials' | 'otp' | 'firstLoginSent';
+type LoginStep = 'credentials' | 'otp' | 'firstLoginSent' | 'forgotPassword' | 'forgotPasswordSent';
 
 export const ClientPanel = () => {
   const { toast } = useToast();
