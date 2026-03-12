@@ -102,6 +102,7 @@ export const Footer = () => {
           <div className="flex gap-6">
             <Link to="/polityka-prywatnosci" className="hover:text-primary transition-colors">Polityka prywatności</Link>
             <Link to="/polityka-cookies" className="hover:text-primary transition-colors">Polityka cookies</Link>
+            <Link to="/ochrona-danych" className="hover:text-primary transition-colors">Ochrona danych</Link>
           </div>
         </div>
       </div>

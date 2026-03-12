@@ -40,6 +40,7 @@ const App = () => (
           <Route path="/polityka-prywatnosci" element={<PrivacyPolicy />} />
           <Route path="/dlaczego-my" element={<WhyUs />} />
           <Route path="/polityka-cookies" element={<CookiePolicy />} />
+          <Route path="/ochrona-danych" element={<DataProtection />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
