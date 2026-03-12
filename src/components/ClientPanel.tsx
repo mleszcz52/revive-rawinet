@@ -967,9 +967,18 @@ export const ClientPanel = () => {
               )}
             </Button>
 
-            <p className="text-xs text-center text-muted-foreground">
-              Pierwszy raz? Wpisz swój email i dowolne hasło — otrzymasz dane logowania na email.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Pierwszy raz? Wpisz email i dowolne hasło.
+              </p>
+              <button
+                type="button"
+                onClick={() => setLoginStep('forgotPassword')}
+                className="text-xs text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
+              >
+                Zapomniałeś hasła?
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 justify-center mt-6 text-xs text-muted-foreground">
