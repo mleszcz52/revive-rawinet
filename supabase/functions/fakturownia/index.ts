@@ -14,6 +14,7 @@ const LOCKOUT_DURATION_MINUTES = 15;
 const PASSWORD_MIN_LENGTH = 8;
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
+const SESSION_DURATION_MINUTES = 30;
 
 // Email config
 const EMAIL_FROM = "automat@rawinet.pl";
