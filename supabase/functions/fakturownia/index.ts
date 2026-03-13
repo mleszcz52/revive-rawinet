@@ -653,7 +653,7 @@ serve(async (req) => {
 
       const sessionToken = generateSessionToken();
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 4);
+      expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
       return new Response(
         JSON.stringify({ 
