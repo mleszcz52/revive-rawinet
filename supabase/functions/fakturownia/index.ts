@@ -14,6 +14,7 @@ const LOCKOUT_DURATION_MINUTES = 15;
 const PASSWORD_MIN_LENGTH = 8;
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
+const SESSION_DURATION_MINUTES = 30;
 
 // Email config
 const EMAIL_FROM = "automat@rawinet.pl";
@@ -403,7 +404,7 @@ serve(async (req) => {
 
         const sessionToken = generateSessionToken();
         const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + 4);
+        expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
         return new Response(
           JSON.stringify({ 
@@ -450,7 +451,7 @@ serve(async (req) => {
 
           const sessionToken = generateSessionToken();
           const expiresAt = new Date();
-          expiresAt.setHours(expiresAt.getHours() + 4);
+          expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
           return new Response(
             JSON.stringify({ 
@@ -522,7 +523,7 @@ serve(async (req) => {
 
       const sessionToken = generateSessionToken();
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 4);
+      expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
       return new Response(
         JSON.stringify({ 
@@ -652,7 +653,7 @@ serve(async (req) => {
 
       const sessionToken = generateSessionToken();
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 4);
+      expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
       return new Response(
         JSON.stringify({ 
@@ -1126,7 +1127,7 @@ serve(async (req) => {
 
       const sessionToken = generateSessionToken();
       const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 4);
+      expiresAt.setMinutes(expiresAt.getMinutes() + SESSION_DURATION_MINUTES);
 
       return new Response(
         JSON.stringify({ 
