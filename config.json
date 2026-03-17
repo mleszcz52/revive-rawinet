@@ -1,0 +1,412 @@
+{
+  "context": "8F42B1C3-5D9E-4A7B-B2E1-9C3F4D5A6E7B",
+  "project": {
+    "name": "RAWI-NET Panel Klienta Mobile",
+    "backend": "Lovable Cloud",
+    "integrationMode": "existing_backend_only",
+    "notes": [
+      "Aplikacja mobilna ma komunikować się wyłącznie z backendem HTTP.",
+      "Nie łączyć aplikacji mobilnej bezpośrednio z tabelami bazy.",
+      "Nie osadzać prywatnych kluczy API ani sekretów w aplikacji mobilnej."
+    ]
+  },
+  "app": {
+    "sessionTimeoutMinutes": 30,
+    "sessionStorage": {
+      "recommended": "secure_device_storage",
+      "clearOnLogout": true,
+      "clearOnExpiry": true
+    },
+    "rememberDevice": true,
+    "otp": {
+      "length": 6,
+      "expiryMinutes": 10,
+      "maxAttempts": 5,
+      "resendCooldownSeconds": 60
+    },
+    "loginProtection": {
+      "maxFailedAttempts": 5,
+      "lockoutMinutes": 15
+    },
+    "passwordPolicy": {
+      "minLength": 8,
+      "requiresUppercase": true,
+      "requiresNumber": true,
+      "requiresSpecialCharacter": true
+    }
+  },
+  "backend": {
+    "type": "edge_function",
+    "functionName": "fakturownia",
+    "method": "POST",
+    "contentType": "application/json",
+    "endpoint": "https://cqbwkhhefnurmddwazsk.supabase.co/functions/v1/fakturownia",
+    "cors": {
+      "allowOrigin": "*",
+      "allowHeaders": [
+        "authorization",
+        "x-client-info",
+        "x-supabase-client-platform",
+        "apikey",
+        "content-type"
+      ],
+      "allowMethods": [
+        "GET",
+        "POST",
+        "OPTIONS"
+      ]
+    }
+  },
+  "publicConfig": {
+    "projectId": "cqbwkhhefnurmddwazsk",
+    "publishableKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxYndraGhlZm51cm1kZHdhenNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MDQ0NzUsImV4cCI6MjA4NTA4MDQ3NX0.Hf1tC1y24Zt3L4w5IVjRQD-P5k934u5CQMNg4ghdrY",
+    "publishableKeyUsage": "opcjonalne; nie jest wymagane, jeśli mobile korzysta wyłącznie z endpointu backendu",
+    "backendUrl": "https://cqbwkhhefnurmddwazsk.supabase.co",
+    "backendUrlUsage": "opcjonalne; preferowany jest pełny endpoint funkcji"
+  },
+  "database": {
+    "directAccessAllowed": false,
+    "tablesUsedByBackend": {
+      "client_credentials": {
+        "purpose": "Poświadczenia klienta, blokady konta, wymuszenie zmiany hasła.",
+        "columns": {
+          "id": "uuid",
+          "email": "text",
+          "password_hash": "text",
+          "client_name": "text | null",
+          "must_change_password": "boolean | null",
+          "temp_password": "text | null",
+          "failed_attempts": "integer | null",
+          "locked_until": "timestamptz | null",
+          "last_login": "timestamptz | null",
+          "created_at": "timestamptz | null",
+          "updated_at": "timestamptz | null"
+        }
+      },
+      "client_otp_codes": {
+        "purpose": "Jednorazowe kody OTP dla nowych urządzeń i ponownych wysyłek.",
+        "columns": {
+          "id": "uuid",
+          "client_email": "text",
+          "code": "text",
+          "device_fingerprint": "text | null",
+          "attempts": "integer | null",
+          "used": "boolean | null",
+          "expires_at": "timestamptz",
+          "created_at": "timestamptz | null"
+        }
+      },
+      "client_devices": {
+        "purpose": "Lista zaufanych urządzeń klienta.",
+        "columns": {
+          "id": "uuid",
+          "client_email": "text",
+          "device_fingerprint": "text",
+          "device_name": "text | null",
+          "is_trusted": "boolean | null",
+          "first_seen_at": "timestamptz | null",
+          "last_seen_at": "timestamptz | null"
+        }
+      },
+      "login_attempts": {
+        "purpose": "Audyt prób logowania i obsługa ochrony brute-force.",
+        "columns": {
+          "id": "uuid",
+          "email": "text",
+          "success": "boolean",
+          "ip_address": "text | null",
+          "user_agent": "text | null",
+          "attempted_at": "timestamptz | null"
+        }
+      },
+      "admin_credentials": {
+        "purpose": "Panel administracyjny; nie używać w aplikacji mobilnej klienta bez osobnego zakresu.",
+        "columns": {
+          "id": "uuid",
+          "email": "text",
+          "password_hash": "text",
+          "failed_attempts": "integer | null",
+          "locked_until": "timestamptz | null",
+          "last_login": "timestamptz | null",
+          "created_at": "timestamptz | null",
+          "updated_at": "timestamptz | null"
+        }
+      }
+    }
+  },
+  "authFlow": {
+    "login": {
+      "action": "verifyPassword",
+      "input": {
+        "email": "string",
+        "password": "string",
+        "deviceFingerprint": "string",
+        "ipAddress": "string | optional"
+      },
+      "successResponse": {
+        "valid": true,
+        "mustChangePassword": false,
+        "clientName": "string | null",
+        "sessionToken": "string(64)",
+        "expiresAt": "ISO_DATE"
+      },
+      "firstLoginResponse": {
+        "valid": false,
+        "firstLogin": true,
+        "emailSent": true,
+        "message": "string"
+      },
+      "newDeviceResponse": {
+        "valid": false,
+        "requiresOtp": true,
+        "emailSent": true,
+        "message": "string"
+      },
+      "lockedResponse": {
+        "valid": false,
+        "locked": true,
+        "lockedUntil": "ISO_DATE",
+        "message": "string"
+      },
+      "invalidPasswordResponse": {
+        "valid": false,
+        "message": "string",
+        "remainingAttempts": "number",
+        "locked": false
+      }
+    },
+    "otpVerification": {
+      "action": "verifyOtp",
+      "input": {
+        "email": "string",
+        "otpCode": "string(6)",
+        "deviceFingerprint": "string",
+        "deviceName": "string | optional",
+        "trustDevice": "boolean"
+      },
+      "successResponse": {
+        "valid": true,
+        "mustChangePassword": false,
+        "clientName": "string | null",
+        "sessionToken": "string(64)",
+        "expiresAt": "ISO_DATE"
+      },
+      "expiredResponse": {
+        "valid": false,
+        "expired": true,
+        "message": "string"
+      },
+      "invalidResponse": {
+        "valid": false,
+        "message": "string",
+        "remainingAttempts": "number | optional"
+      }
+    },
+    "otpResend": {
+      "action": "resendOtp",
+      "input": {
+        "email": "string",
+        "deviceFingerprint": "string"
+      },
+      "successResponse": {
+        "success": true,
+        "message": "Nowy kod został wysłany."
+      },
+      "cooldownResponse": {
+        "success": false,
+        "message": "Poczekaj XXs przed ponownym wysłaniem."
+      }
+    },
+    "resetPassword": {
+      "action": "resetPassword",
+      "input": {
+        "email": "string"
+      },
+      "response": {
+        "success": true,
+        "message": "Jeśli konto istnieje, nowe hasło zostanie wysłane na podany adres email."
+      }
+    },
+    "changePassword": {
+      "action": "changePassword",
+      "input": {
+        "email": "string",
+        "password": "string",
+        "newPassword": "string",
+        "deviceFingerprint": "string | optional",
+        "deviceName": "string | optional"
+      },
+      "successResponse": {
+        "success": true,
+        "message": "Hasło zostało zmienione"
+      },
+      "errorResponse": {
+        "success": false,
+        "message": "string"
+      }
+    }
+  },
+  "api": {
+    "clientActions": {
+      "getClientByEmail": {
+        "request": {
+          "action": "getClientByEmail",
+          "email": "user@example.com"
+        },
+        "responseType": "Client[]",
+        "responseExample": [
+          {
+            "id": 12345,
+            "name": "Jan Kowalski",
+            "email": "user@example.com",
+            "phone": "+48 600 000 000",
+            "city": "Rawicz",
+            "post_code": "63-900",
+            "street": "Przykładowa 1",
+            "tax_no": null
+          }
+        ]
+      },
+      "getClientInvoices": {
+        "request": {
+          "action": "getClientInvoices",
+          "clientId": 12345
+        },
+        "responseType": "Invoice[]",
+        "filtersAppliedByBackend": [
+          "Zwracane są tylko faktury od roku 2026 wzwyż."
+        ],
+        "responseExample": [
+          {
+            "id": 98765,
+            "number": "FV/1/2026",
+            "issue_date": "2026-01-10",
+            "payment_to": "2026-01-24",
+            "status": "issued",
+            "price_gross": "89.99",
+            "price_net": "73.16",
+            "paid": "0.00",
+            "currency": "PLN",
+            "payment_url": null
+          }
+        ]
+      },
+      "getClientPayments": {
+        "request": {
+          "action": "getClientPayments",
+          "clientId": 12345
+        },
+        "responseType": "Payment[]",
+        "responseExample": [
+          {
+            "id": 444,
+            "name": "Wpłata za internet",
+            "price": "89.99",
+            "paid_date": "2026-01-15",
+            "invoice_id": 98765
+          }
+        ]
+      },
+      "getInvoicePdf": {
+        "request": {
+          "action": "getInvoicePdf",
+          "invoiceId": 98765
+        },
+        "responseType": "InvoicePdfResult",
+        "responseExample": {
+          "pdfUrl": "https://rawi-net.fakturownia.pl/invoices/98765.pdf?api_token=SERVER_SIDE_TOKEN",
+          "invoice": {
+            "id": 98765,
+            "number": "FV/1/2026"
+          }
+        },
+        "implementationNote": "Aplikacja mobilna powinna otwierać pdfUrl w przeglądarce systemowej lub webview; URL zawiera token wygenerowany po stronie backendu."
+      }
+    },
+    "dataModels": {
+      "Client": {
+        "id": "number",
+        "name": "string",
+        "email": "string",
+        "phone": "string | optional",
+        "city": "string | optional",
+        "post_code": "string | optional",
+        "street": "string | optional",
+        "tax_no": "string | optional"
+      },
+      "Invoice": {
+        "id": "number",
+        "number": "string",
+        "issue_date": "string",
+        "payment_to": "string",
+        "status": "string",
+        "price_gross": "string",
+        "price_net": "string",
+        "paid": "string",
+        "currency": "string",
+        "payment_url": "string | null | optional"
+      },
+      "Payment": {
+        "id": "number",
+        "name": "string",
+        "price": "string",
+        "paid_date": "string",
+        "invoice_id": "number | optional"
+      },
+      "Session": {
+        "email": "string",
+        "clientName": "string | null",
+        "sessionToken": "string",
+        "expiresAt": "ISO_DATE",
+        "mustChangePassword": "boolean"
+      }
+    }
+  },
+  "backendSecrets": {
+    "important": "Poniższe sekrety są dostępne wyłącznie po stronie backendu. Nie umieszczać ich w aplikacji mobilnej, repozytorium ani promptach do generatorów.",
+    "availableInBackend": [
+      "FAKTUROWNIA_API_TOKEN",
+      "FAKTUROWNIA_DOMAIN",
+      "RESEND_API_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_URL",
+      "SUPABASE_ANON_KEY",
+      "SUPABASE_PUBLISHABLE_KEY",
+      "SUPABASE_DB_URL",
+      "LOVABLE_API_KEY",
+      "SMTP_PASSWORD"
+    ],
+    "requiredForThisMobileIntegration": [
+      "FAKTUROWNIA_API_TOKEN",
+      "FAKTUROWNIA_DOMAIN",
+      "RESEND_API_KEY",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "SUPABASE_URL",
+      "SUPABASE_ANON_KEY"
+    ],
+    "handoverRule": "Jeśli zespół mobile stawia osobną kopię backendu, sekrety przekazać wyłącznie przez vault / menedżer sekretów / CI secrets. Nigdy przez kod aplikacji mobilnej."
+  },
+  "security": {
+    "bcryptCost": 12,
+    "sessionTokenGeneratedServerSide": true,
+    "trustedDevicesStoredServerSide": true,
+    "temporaryPasswordsSentByEmail": true,
+    "otpSentByEmail": true,
+    "emailSender": "automat@rawinet.pl",
+    "requirements": [
+      "Nie logować haseł, OTP ani haseł tymczasowych po stronie mobile.",
+      "Czyścić sesję po wylogowaniu, zamknięciu flow i przekroczeniu expiresAt.",
+      "Przechowywać fingerprint urządzenia lokalnie i wysyłać go przy verifyPassword, verifyOtp, resendOtp i changePassword.",
+      "Nie odpytywać bazy bezpośrednio z aplikacji mobilnej.",
+      "Wszystkie dane abonenta pobierać przez istniejący endpoint backendu.",
+      "Obsługiwać komunikaty blokady konta i wygaśnięcia kodu bez ujawniania nadmiarowych danych o koncie."
+    ]
+  },
+  "mobileImplementationChecklist": [
+    "Dodać warstwę API POST do endpointu backendu z polem action.",
+    "Wdrożyć lokalny secure storage dla sesji i fingerprintu urządzenia.",
+    "Obsłużyć stany: first login, new device OTP, locked account, password change required.",
+    "Dodać ekran danych klienta, listy faktur, płatności i pobierania PDF.",
+    "Nie używać prywatnych kluczy API w aplikacji mobilnej."
+  ]
+}
