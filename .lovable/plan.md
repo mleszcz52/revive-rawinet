@@ -1,131 +1,192 @@
 
-## Plan: Redukcja przycisków i dodanie informacji o cookies
+Cel: przygotować bezpieczny pakiet integracyjny dla aplikacji mobilnej panelu klienta. Najlepsza architektura to nie łączyć aplikacji mobilnej bezpośrednio z bazą, tylko z istniejącym backendem. Baza i prywatne klucze zostają po stronie backendu.
 
-### Analiza obecnego stanu
+1. Rekomendowany model integracji
+- Aplikacja mobilna ma wywoływać tylko endpoint backendu:
+  - `https://cqbwkhhefnurmddwazsk.supabase.co/functions/v1/fakturownia`
+- Nie podłączać aplikacji mobilnej bezpośrednio do tabel bazy.
+- Nie osadzać w aplikacji mobilnej prywatnych sekretów.
 
-Po przejrzeniu wszystkich stron serwisu zauważylem nastepujace problemy z nadmiarem przyciskow:
+2. Dane, które możesz przekazać zespołowi mobile
+```json
+{
+  "app": {
+    "name": "RAWI-NET Panel Klienta",
+    "sessionTimeoutMinutes": 30,
+    "rememberDevice": true,
+    "otpLength": 6,
+    "otpExpiryMinutes": 10,
+    "maxLoginAttempts": 5,
+    "lockoutMinutes": 15
+  },
+  "backend": {
+    "mode": "existing_backend",
+    "functionEndpoint": "https://cqbwkhhefnurmddwazsk.supabase.co/functions/v1/fakturownia",
+    "authModel": "custom_backend_auth",
+    "notes": [
+      "App should call backend function only",
+      "Do not connect directly to database tables from mobile client",
+      "Do not store private API keys in the mobile app"
+    ]
+  },
+  "publicConfig": {
+    "projectId": "cqbwkhhefnurmddwazsk",
+    "publishableKey": "available_in_current_project_but_not_required_if_app_calls_backend_only",
+    "backendUrl": "available_in_current_project_but_not_required_if_app_calls_backend_only"
+  }
+}
+```
 
-**Strony z wieloma przyciskami:**
-- **Hero (strona glowna):** 2 przyciski ("Sprawdz dostepnosc", "Zobacz oferte")
-- **Sekcja routerow:** 3 przyciski "Wybierz opcje" (po jednym na kazda karte)
-- **Internet:** 2 przyciski telefoniczne w hero + 3 przyciski "Zadzwon i zamow" w pakietach
-- **Telewizja:** 2 przyciski w hero + 3 w pakietach TV + 1 w TV Smart + 1 pod pakietami tematycznymi + 1 w Multiroom + 1 w Smart TV = 9 przyciskow
-- **Internet+TV:** 2 przyciski w hero + 9 przyciskow w kartach pakietow = 11 przyciskow
-- **Biznes:** 2 przyciski w hero + 1 na koncu = 3 przyciski
+3. Prywatne sekrety backendowe
+Tych wartości nie należy wklejać do aplikacji mobilnej. Są potrzebne tylko wtedy, jeśli ktoś będzie stawiał osobną kopię backendu:
+- `FAKTUROWNIA_API_TOKEN`
+- `FAKTUROWNIA_DOMAIN`
+- `RESEND_API_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
 
----
+Wewnętrzna zasada przekazania:
+- sekretów nie wysyłać w repo ani w promptach do generatora aplikacji,
+- przekazać je osobno w menedżerze sekretów / panelu CI / bezpiecznym vault.
 
-## Czesc 1: Redukcja przyciskow
+4. Struktura bazy używana przez logowanie klienta
+Aplikacja mobilna nie powinna pisać do tych tabel bezpośrednio, ale zespół mobile powinien znać model danych:
 
-### 1.1 Strona glowna (Index)
+`client_credentials`
+- `id: uuid`
+- `email: text`
+- `password_hash: text`
+- `client_name: text | null`
+- `must_change_password: boolean`
+- `temp_password: text | null`
+- `failed_attempts: integer`
+- `locked_until: timestamptz | null`
+- `last_login: timestamptz | null`
+- `created_at: timestamptz`
+- `updated_at: timestamptz`
 
-**Hero - pozostawiam:**
-- "Sprawdz dostepnosc" - glowne CTA (zostawic)
-- "Zobacz oferte" - drugie CTA (zostawic)
+`client_otp_codes`
+- `id: uuid`
+- `client_email: text`
+- `code: text`
+- `device_fingerprint: text | null`
+- `attempts: integer`
+- `used: boolean`
+- `expires_at: timestamptz`
+- `created_at: timestamptz`
 
-**RouterOptions - zmiana:**
-- Usunac 3 przyciski "Wybierz opcje" z kart routerow (brak konkretnego dzialania)
-- Dodac JEDEN wspolny przycisk kontaktowy pod wszystkimi kartami
+`client_devices`
+- `id: uuid`
+- `client_email: text`
+- `device_fingerprint: text`
+- `device_name: text | null`
+- `is_trusted: boolean`
+- `first_seen_at: timestamptz`
+- `last_seen_at: timestamptz`
 
-### 1.2 Strona Internet
+`login_attempts`
+- `id: uuid`
+- `email: text`
+- `success: boolean`
+- `ip_address: text | null`
+- `user_agent: text | null`
+- `attempted_at: timestamptz`
 
-**Hero:**
-- Zostaw tylko 1 glowny przycisk telefoniczny (Biuro: 505 051 376)
-- Drugi numer (Dzial techniczny) zamienic na tekst/link bez stylu przycisku
+5. Kontrakt API dla aplikacji mobilnej
+Wszystkie requesty: `POST` na endpoint funkcji, body JSON.
 
-**Pakiety internetowe:**
-- Usunac 3 przyciski "Zadzwon i zamow" z kart
-- Dodac 1 wspolny przycisk kontaktowy pod wszystkimi pakietami
+Logowanie:
+- `verifyPassword`
+```json
+{ "action": "verifyPassword", "email": "user@example.com", "password": "Haslo123!", "deviceFingerprint": "device-id", "ipAddress": "optional" }
+```
 
-### 1.3 Strona Telewizja
+Możliwe odpowiedzi:
+- sukces:
+```json
+{ "valid": true, "mustChangePassword": false, "clientName": "Jan Kowalski", "sessionToken": "token", "expiresAt": "ISO_DATE" }
+```
+- pierwsze logowanie:
+```json
+{ "valid": false, "firstLogin": true, "emailSent": true, "message": "..." }
+```
+- nowe urządzenie:
+```json
+{ "valid": false, "requiresOtp": true, "emailSent": true, "message": "..." }
+```
+- blokada:
+```json
+{ "valid": false, "locked": true, "lockedUntil": "ISO_DATE", "message": "..." }
+```
 
-**Hero:**
-- Jeden glowny przycisk (Biuro), drugi numer jako link tekstowy
+OTP:
+- `verifyOtp`
+```json
+{ "action": "verifyOtp", "email": "user@example.com", "otpCode": "123456", "deviceFingerprint": "device-id", "deviceName": "Android/iPhone model", "trustDevice": true }
+```
 
-**TV Smart sekcja:**
-- Zostawic tylko 1 przycisk "Wiecej informacji" (link zewnetrzny do JAMBOX)
-- Usunac "Zamow teraz" (redundantny)
+Ponowne wysłanie OTP:
+- `resendOtp`
+```json
+{ "action": "resendOtp", "email": "user@example.com", "deviceFingerprint": "device-id" }
+```
 
-**Pakiety TV:**
-- Usunac 3 przyciski z kart pakietow
-- Jeden wspolny CTA pod sekcja
+Reset hasła:
+- `resetPassword`
+```json
+{ "action": "resetPassword", "email": "user@example.com" }
+```
 
-**Pod pakietami tematycznymi/premium:**
-- Usunac przycisk "Zamow pakiet dodatkowy"
+Zmiana hasła:
+- `changePassword`
+```json
+{ "action": "changePassword", "email": "user@example.com", "password": "StareLubTymczasowe123!", "newPassword": "NoweHaslo123!", "deviceFingerprint": "device-id", "deviceName": "Android/iPhone model" }
+```
 
-**Multiroom:**
-- Zostawic przycisk "Zamow Multiroom"
+Dane klienta:
+- `getClientByEmail`
+```json
+{ "action": "getClientByEmail", "email": "user@example.com" }
+```
 
-**Smart TV na dole:**
-- Usunac "Zapytaj o szczegoly" (informacje juz sa widoczne)
+Faktury:
+- `getClientInvoices`
+```json
+{ "action": "getClientInvoices", "clientId": 12345 }
+```
+Uwaga: backend zwraca tylko faktury od roku 2026 wzwyż.
 
-### 1.4 Strona Internet+TV
+Płatności:
+- `getClientPayments`
+```json
+{ "action": "getClientPayments", "clientId": 12345 }
+```
 
-**Hero:**
-- Jeden przycisk (Biuro), drugi jako link tekstowy
+PDF faktury:
+- `getInvoicePdf`
+```json
+{ "action": "getInvoicePdf", "invoiceId": 98765 }
+```
 
-**Pakiety bundlowe (9 kart x 3 kategorie):**
-- Usunac wszystkie przyciski z kart
-- Dodac 1 wspolny CTA na samym dole strony
+6. Wymagania bezpieczeństwa dla aplikacji mobilnej
+- Nie przechowywać prywatnych kluczy API w aplikacji.
+- Sesję przechowywać w bezpiecznym storage po stronie urządzenia.
+- Wymuszać wylogowanie po `expiresAt` lub po 30 minutach.
+- Fingerprint urządzenia zapisywać lokalnie i używać przy logowaniu/OTP.
+- Hasła nie mogą być logowane.
+- OTP i hasła tymczasowe nigdy nie mogą być cache’owane ani pokazywane w logach debug.
 
-### 1.5 Strona Biznes
+7. Co przekazać AI Studio / zespołowi mobile jako minimum
+- endpoint backendu,
+- listę akcji API,
+- przykładowe payloady i odpowiedzi,
+- model sesji,
+- zasady OTP i trusted device,
+- informację, że baza i sekrety są po stronie backendu.
 
-**Hero:**
-- Jeden przycisk, drugi jako link tekstowy
+8. Najważniejsze doprecyzowanie
+Jeśli chcesz uruchamiać aplikację mobilną na obecnym backendzie, nie musisz przekazywać wartości prywatnych kluczy API do aplikacji mobilnej. Wystarczy endpoint i kontrakt API. Prywatne sekrety są potrzebne tylko przy stawianiu nowej, osobnej kopii backendu.
 
-**CTA na koncu:**
-- Zostawic (jedyny pozostaly)
-
----
-
-## Czesc 2: Cookie Banner
-
-### 2.1 Nowy komponent: CookieConsent
-
-Utworze nowy komponent wyswietlajacy baner cookies na dole strony:
-- Informacja o uzywaniu plikow cookies
-- Przycisk "Akceptuje"
-- Link do polityki prywatnosci
-- Zapisanie zgody w localStorage
-
-### 2.2 Wyglad
-
-- Pozycja: fixed na dole ekranu
-- Tlo: bg-card z cieniem
-- Responsywny - zawijanie na mobile
-- Animacja pojawienia sie
-
-### 2.3 Integracja
-
-Dodam komponent do glownego layoutu (App.tsx) tak aby byl widoczny na wszystkich stronach.
-
----
-
-## Podsumowanie zmian
-
-| Strona | Przed | Po |
-|--------|-------|-----|
-| Index (Hero) | 2 | 2 |
-| Index (Routery) | 3 | 1 |
-| Internet | 5 | 2 |
-| Telewizja | 9 | 3 |
-| Internet+TV | 11 | 2 |
-| Biznes | 3 | 2 |
-| **RAZEM** | **33** | **12** |
-
----
-
-## Szczegoly techniczne
-
-### Pliki do modyfikacji:
-1. `src/components/RouterOptions.tsx` - usunac przyciski z kart, dodac jeden wspolny
-2. `src/pages/Internet.tsx` - redukcja przyciskow w hero i pakietach
-3. `src/pages/Television.tsx` - usuniecie redundantnych przyciskow
-4. `src/pages/InternetTV.tsx` - usuniecie przyciskow z kart, jeden wspolny CTA
-5. `src/pages/Business.tsx` - zmiana drugiego numeru na link tekstowy
-
-### Nowe pliki:
-1. `src/components/CookieConsent.tsx` - baner cookies
-
-### Plik do aktualizacji dla cookies:
-1. `src/App.tsx` - dodanie komponentu CookieConsent
+Jeśli chcesz, następny krok powinien być taki:
+przygotuję Ci gotowy plik `config.json` dla zespołu mobile z pełnym kontraktem request/response dla wszystkich akcji.
