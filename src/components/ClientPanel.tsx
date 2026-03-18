@@ -36,6 +36,7 @@ interface Client {
   street?: string;
   tax_no?: string;
   bank_account?: string;
+  mass_payment_code?: string;
 }
 
 interface Invoice {
