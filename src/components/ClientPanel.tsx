@@ -34,6 +34,7 @@ interface Client {
   post_code?: string;
   street?: string;
   tax_no?: string;
+  bank_account?: string;
 }
 
 interface Invoice {
