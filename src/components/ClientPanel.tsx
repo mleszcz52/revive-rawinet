@@ -1255,6 +1255,15 @@ export const ClientPanel = () => {
                 <p className="text-lg font-medium text-foreground">{client.tax_no}</p>
               </div>
             )}
+            {client.bank_account && (
+              <div className="md:col-span-2">
+                <Label className="text-muted-foreground">Indywidualny numer konta bankowego</Label>
+                <div className="flex items-center gap-3 mt-1">
+                  <CreditCard className="w-5 h-5 text-primary shrink-0" />
+                  <p className="text-lg font-mono font-medium text-foreground tracking-wider">{client.bank_account}</p>
+                </div>
+              </div>
+            )}
             {(client.street || client.city) && (
               <div className="md:col-span-2">
                 <Label className="text-muted-foreground">Adres</Label>
