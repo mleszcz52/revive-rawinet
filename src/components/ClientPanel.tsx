@@ -30,6 +30,7 @@ interface Client {
   name: string;
   email: string;
   phone?: string;
+  mobile_phone?: string;
   city?: string;
   post_code?: string;
   street?: string;
