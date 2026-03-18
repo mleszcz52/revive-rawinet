@@ -30,6 +30,7 @@ interface Client {
   name: string;
   email: string;
   phone?: string;
+  mobile_phone?: string;
   city?: string;
   post_code?: string;
   street?: string;
@@ -1243,10 +1244,18 @@ export const ClientPanel = () => {
               <Label className="text-muted-foreground">Email</Label>
               <p className="text-lg font-medium text-foreground">{client.email}</p>
             </div>
-            {client.phone && (
+            {(client.phone || client.mobile_phone) && (
               <div>
                 <Label className="text-muted-foreground">Telefon</Label>
-                <p className="text-lg font-medium text-foreground">{client.phone}</p>
+                <p className="text-lg font-medium text-foreground">
+                  {client.phone || client.mobile_phone}
+                </p>
+                {client.phone && client.mobile_phone && client.phone !== client.mobile_phone && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    <Smartphone className="w-3.5 h-3.5 inline mr-1" />
+                    {client.mobile_phone}
+                  </p>
+                )}
               </div>
             )}
             {client.tax_no && (
