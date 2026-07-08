@@ -1,4 +1,5 @@
-import { Check, X, Wifi, Router, Box, Phone } from "lucide-react";
+import { Check, X, Wifi, Router, Box, Phone, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import routerWifi5Image from "@/assets/router-basic.png";
@@ -8,6 +9,7 @@ interface RouterOption {
   title: string;
   price: string;
   priceType: "free" | "once" | "monthly";
+  priceNote?: string;
   icon: typeof Router;
   image: string;
   recommended?: boolean;
@@ -38,7 +40,8 @@ const routerOptions: RouterOption[] = [
   {
     id: 2,
     title: "Router Wi-Fi 7",
-    price: "177 zł",
+    price: "200 zł",
+    priceNote: "Cena zmieniła się z uwagi na wzrost cen na rynku komponentów.",
     priceType: "once",
     icon: Wifi,
     image: routerWifi7Image,
@@ -76,7 +79,7 @@ const routerOptions: RouterOption[] = [
   },
 ];
 
-const PriceLabel = ({ price, type }: { price: string; type: RouterOption["priceType"] }) => {
+const PriceLabel = ({ price, type, note }: { price: string; type: RouterOption["priceType"]; note?: string }) => {
   const labels = {
     free: "",
     once: "jednorazowo",
@@ -85,9 +88,34 @@ const PriceLabel = ({ price, type }: { price: string; type: RouterOption["priceT
 
   return (
     <div className="text-center">
-      <span className="text-3xl lg:text-4xl font-bold text-foreground">{price}</span>
+      <div className="inline-flex items-center gap-2">
+        <span className="text-3xl lg:text-4xl font-bold text-foreground">{price}</span>
+        {note && (
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Informacja o cenie"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs text-center">
+                {note}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
       {type !== "free" && (
         <span className="block text-sm text-muted-foreground mt-1">{labels[type]}</span>
+      )}
+      {note && (
+        <span className="block text-xs text-muted-foreground italic mt-1">
+          Cena zaktualizowana — wzrost cen komponentów
+        </span>
       )}
     </div>
   );
