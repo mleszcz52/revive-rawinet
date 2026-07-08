@@ -176,7 +176,7 @@ export const RouterOptions = () => {
                 {/* Title & Price */}
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold text-foreground mb-4">{option.title}</h3>
-                  <PriceLabel price={option.price} type={option.priceType} />
+                  <PriceLabel price={option.price} type={option.priceType} note={option.priceNote} />
                 </div>
 
                 {/* ONT Note */}
