@@ -936,6 +936,9 @@ class App {
   speedUp: number;
   timeOffset: number;
   private boundOnWindowResize: () => void;
+  paused: boolean;
+  inView: boolean;
+  private boundOnVisibilityChange: () => void;
 
   constructor(container: HTMLElement, options: HyperspeedOptions) {
     this.options = options;
@@ -952,7 +955,8 @@ class App {
       alpha: true
     });
     this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    // Cap pixel ratio — full devicePixelRatio (2-3x) quadruples GPU load with little visual gain
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
     this.composer = new EffectComposer(this.renderer);
     container.appendChild(this.renderer.domElement);
@@ -1012,6 +1016,30 @@ class App {
 
     this.boundOnWindowResize = this.onWindowResize.bind(this);
     window.addEventListener('resize', this.boundOnWindowResize);
+
+    // Pause rendering when the tab is hidden or the canvas is off-screen
+    this.paused = false;
+    this.inView = true;
+    this.boundOnVisibilityChange = () => {
+      this.updatePaused();
+    };
+    document.addEventListener('visibilitychange', this.boundOnVisibilityChange);
+  }
+
+  private updatePaused() {
+    const shouldPause = document.hidden || !this.inView;
+    if (shouldPause !== this.paused) {
+      this.paused = shouldPause;
+      if (!this.paused) {
+        // Reset clock so delta doesn't jump after resuming
+        this.clock.getDelta();
+      }
+    }
+  }
+
+  setInView(inView: boolean) {
+    this.inView = inView;
+    this.updatePaused();
   }
 
   onWindowResize() {
@@ -1189,6 +1217,7 @@ class App {
     }
 
     window.removeEventListener('resize', this.boundOnWindowResize);
+    document.removeEventListener('visibilitychange', this.boundOnVisibilityChange);
     if (this.container) {
       this.container.removeEventListener('mousedown', this.onMouseDown);
       this.container.removeEventListener('mouseup', this.onMouseUp);
@@ -1207,6 +1236,10 @@ class App {
 
   tick() {
     if (this.disposed || !this) return;
+    if (this.paused) {
+      requestAnimationFrame(this.tick);
+      return;
+    }
     if (resizeRendererToDisplaySize(this.renderer, this.setSize)) {
       const canvas = this.renderer.domElement;
       this.camera.aspect = canvas.clientWidth / canvas.clientHeight;
@@ -1250,7 +1283,20 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = DEFAULT_EFFECT_OPTION
     appRef.current = myApp;
     myApp.loadAssets().then(myApp.init);
 
+    // Pause rendering when the animation scrolls out of view
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0];
+        if (appRef.current) {
+          appRef.current.setInView(entry.isIntersecting);
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(container);
+
     return () => {
+      observer.disconnect();
       if (appRef.current) {
         appRef.current.dispose();
         appRef.current = null;
