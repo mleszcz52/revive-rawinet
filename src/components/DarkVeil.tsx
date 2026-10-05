@@ -1,5 +1,6 @@
 // This file now re-exports Hyperspeed as a drop-in replacement for DarkVeil
 import Hyperspeed from './Hyperspeed';
+import { useBackgroundAnimation } from '@/hooks/useBackgroundAnimation';
 
 interface DarkVeilProps {
   speed?: number;
@@ -9,6 +10,11 @@ interface DarkVeilProps {
 }
 
 export const DarkVeil = ({ className = '' }: DarkVeilProps) => {
+  const { enabled } = useBackgroundAnimation();
+
+  // User disabled the animation (or prefers-reduced-motion is set) — render nothing
+  if (!enabled) return null;
+
   return (
     <div className={`absolute inset-0 w-full h-full ${className}`}>
       <Hyperspeed
