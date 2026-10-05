@@ -937,6 +937,7 @@ class App {
   timeOffset: number;
   private boundOnWindowResize: () => void;
   paused: boolean;
+  inView: boolean;
   private boundOnVisibilityChange: () => void;
 
   constructor(container: HTMLElement, options: HyperspeedOptions) {
@@ -1016,23 +1017,29 @@ class App {
     this.boundOnWindowResize = this.onWindowResize.bind(this);
     window.addEventListener('resize', this.boundOnWindowResize);
 
-    // Pause rendering when the tab is hidden — saves CPU/GPU/battery
+    // Pause rendering when the tab is hidden or the canvas is off-screen
     this.paused = false;
+    this.inView = true;
     this.boundOnVisibilityChange = () => {
-      this.paused = document.hidden;
-      if (!this.paused) {
-        // Reset clock so delta doesn't jump after resuming
-        this.clock.getDelta();
-      }
+      this.updatePaused();
     };
     document.addEventListener('visibilitychange', this.boundOnVisibilityChange);
   }
 
-  setPaused(paused: boolean) {
-    this.paused = paused;
-    if (!paused) {
-      this.clock.getDelta();
+  private updatePaused() {
+    const shouldPause = document.hidden || !this.inView;
+    if (shouldPause !== this.paused) {
+      this.paused = shouldPause;
+      if (!this.paused) {
+        // Reset clock so delta doesn't jump after resuming
+        this.clock.getDelta();
+      }
     }
+  }
+
+  setInView(inView: boolean) {
+    this.inView = inView;
+    this.updatePaused();
   }
 
   onWindowResize() {
@@ -1281,7 +1288,7 @@ const Hyperspeed: FC<HyperspeedProps> = ({ effectOptions = DEFAULT_EFFECT_OPTION
       entries => {
         const entry = entries[0];
         if (appRef.current) {
-          appRef.current.setPaused(!entry.isIntersecting);
+          appRef.current.setInView(entry.isIntersecting);
         }
       },
       { threshold: 0 }
