@@ -14,15 +14,31 @@ const getInitialEnabled = (): boolean => {
   return !prefersReducedMotion();
 };
 
+// Shared store so the toggle button and every background instance stay in sync
+let enabled = getInitialEnabled();
+const listeners = new Set<(value: boolean) => void>();
+
+const setEnabledGlobal = (value: boolean) => {
+  enabled = value;
+  listeners.forEach(listener => listener(value));
+};
+
 export const useBackgroundAnimation = () => {
-  const [enabled, setEnabled] = useState<boolean>(getInitialEnabled);
+  const [isEnabled, setIsEnabled] = useState<boolean>(enabled);
+
+  useEffect(() => {
+    listeners.add(setIsEnabled);
+    return () => {
+      listeners.delete(setIsEnabled);
+    };
+  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onChange = () => {
       // Only auto-follow the system setting when the user hasn't chosen manually
       if (window.localStorage.getItem(STORAGE_KEY) === null) {
-        setEnabled(!media.matches);
+        setEnabledGlobal(!media.matches);
       }
     };
     media.addEventListener("change", onChange);
@@ -30,12 +46,10 @@ export const useBackgroundAnimation = () => {
   }, []);
 
   const toggle = useCallback(() => {
-    setEnabled(prev => {
-      const next = !prev;
-      window.localStorage.setItem(STORAGE_KEY, next ? "on" : "off");
-      return next;
-    });
+    const next = !enabled;
+    window.localStorage.setItem(STORAGE_KEY, next ? "on" : "off");
+    setEnabledGlobal(next);
   }, []);
 
-  return { enabled, toggle };
+  return { enabled: isEnabled, toggle };
 };
