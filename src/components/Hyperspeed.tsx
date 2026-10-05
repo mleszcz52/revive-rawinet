@@ -936,6 +936,8 @@ class App {
   speedUp: number;
   timeOffset: number;
   private boundOnWindowResize: () => void;
+  paused: boolean;
+  private boundOnVisibilityChange: () => void;
 
   constructor(container: HTMLElement, options: HyperspeedOptions) {
     this.options = options;
@@ -952,7 +954,8 @@ class App {
       alpha: true
     });
     this.renderer.setSize(container.offsetWidth, container.offsetHeight, false);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    // Cap pixel ratio — full devicePixelRatio (2-3x) quadruples GPU load with little visual gain
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
     this.composer = new EffectComposer(this.renderer);
     container.appendChild(this.renderer.domElement);
