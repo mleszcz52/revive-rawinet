@@ -1,0 +1,37 @@
+# Rawi-Net — konfiguracja hostingu Apache (home.pl)
+# Ten plik leży w public/, więc trafia automatycznie do dist/ przy `npm run build`.
+
+RewriteEngine On
+RewriteBase /
+
+# Istniejące pliki i katalogi (JS, CSS, obrazki, favicon) serwujemy normalnie
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Wszystko inne (deep linki i odświeżenie strony) trafia do index.html
+RewriteRule ^ index.html [QSA,L]
+
+# Kompresja tekstu
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# Pliki z hashem w nazwie (assets/) można trzymać w przeglądarce długo
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|gif|svg|webp|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  # index.html zawsze najświeższy, żeby nowa wersja strony weszła od razu
+  <Files "index.html">
+    Header set Cache-Control "no-cache"
+  </Files>
+</IfModule>
+
+# Nikt nie zagląda do zawartości tego pliku
+<IfModule mod_authz_core.c>
+  <Files ".htaccess">
+    Require all denied
+  </Files>
+</IfModule>
