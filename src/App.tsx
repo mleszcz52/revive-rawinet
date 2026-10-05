@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import { CookieConsent } from "./components/CookieConsent";
+import { BackgroundAnimationToggle } from "./components/BackgroundAnimationToggle";
 import { ScrollToTop } from "./components/ScrollToTop";
 
 import Internet from "./pages/Internet";
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <CookieConsent />
+        <BackgroundAnimationToggle />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
