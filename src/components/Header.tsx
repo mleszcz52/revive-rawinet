@@ -11,6 +11,7 @@ const navItems = [
   { label: "Internet+Telewizja", href: "/internet-telewizja" },
   { label: "Internet Biznes", href: "/biznes" },
   { label: "Dlaczego My?", href: "/dlaczego-my" },
+  { label: "Poradnik", href: "/poradnik" },
   { label: "Dla Abonenta", href: "/dla-abonenta" },
 ];
 

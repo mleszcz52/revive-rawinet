@@ -45,6 +45,11 @@ export const Footer = () => {
                   Dla Biznesu
                 </Link>
               </li>
+              <li>
+                <Link to="/poradnik" className="text-secondary-foreground/70 hover:text-primary transition-colors">
+                  Poradnik Wi-Fi
+                </Link>
+              </li>
             </ul>
           </div>
 
