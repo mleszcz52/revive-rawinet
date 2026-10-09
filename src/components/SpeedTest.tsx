@@ -113,6 +113,7 @@ export const SpeedTest = () => {
   const coloRef = useRef("");
   const alive = useRef(true);
   const maxRef = useRef(100);
+  const phaseRef = useRef<Phase>("idle");
 
   useEffect(() => {
     alive.current = true;
