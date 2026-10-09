@@ -266,18 +266,36 @@ export const SpeedTest = () => {
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 mb-12">
-      <h3 className="text-xl font-semibold text-foreground mb-1 text-center">
-        Test prędkości Rawi-Net
-      </h3>
-      <p className="text-sm text-muted-foreground text-center mb-2">
-        Pomiar trwa kilkanaście sekund i idzie do sieci Cloudflare — mierzy pobieranie, wysyłanie,
-        opóźnienie, straty pakietów oraz jakość łącza dla streamingu, gier i wideorozmów.
-      </p>
-      <p className="text-xs text-muted-foreground text-center mb-6 max-w-2xl mx-auto">
-        Strona wykonuje kilkadziesiąt prób w coraz większych porcjach (od 100 kB do 250 MB przy
-        pobieraniu i do 50 MB przy wysyłaniu), a między nimi sprawdza opóźnienie. Jako wynik pokazuje
-        najlepsze powtarzalne wartości, nie średnią — średnią zaniżają chwilowe spadki.
-      </p>
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <h3 className="text-xl font-semibold text-foreground text-center">
+          Test prędkości Rawi-Net
+        </h3>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label="Jak działa ten pomiar"
+              className="shrink-0 rounded-full border border-border text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors p-1"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="center" className="w-[22rem] max-w-[85vw] text-sm leading-relaxed">
+            <p className="font-medium text-foreground mb-2">Jak działa ten pomiar?</p>
+            <p className="text-muted-foreground mb-3">
+              Pomiar trwa kilkanaście sekund i idzie do sieci Cloudflare — mierzy pobieranie,
+              wysyłanie, opóźnienie, straty pakietów oraz jakość łącza dla streamingu, gier i
+              wideorozmów.
+            </p>
+            <p className="text-muted-foreground">
+              Strona wykonuje kilkadziesiąt prób w coraz większych porcjach (od 100 kB do 250 MB przy
+              pobieraniu i do 50 MB przy wysyłaniu), a między nimi sprawdza opóźnienie. Jako wynik
+              pokazuje najlepsze powtarzalne wartości, nie średnią — średnią zaniżają chwilowe spadki.
+            </p>
+          </PopoverContent>
+        </Popover>
+      </div>
+
 
       <div className="relative">
         <Arc value={showing} max={maxRef.current} />
