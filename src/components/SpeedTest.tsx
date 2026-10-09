@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SpeedTestEngine from "@cloudflare/speedtest";
 import type { MeasurementType, Results as CfResults } from "@cloudflare/speedtest";
+import type { LucideIcon } from "lucide-react";
 import {
   Activity,
   ArrowDownToLine,
@@ -104,6 +105,32 @@ const Arc = ({ value, max }: { value: number; max: number }) => {
     </svg>
   );
 };
+
+const Metric = ({
+  icon: Icon,
+  label,
+  value,
+  unit,
+  hint,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  unit: string;
+  hint: string;
+}) => (
+  <div className="rounded-lg bg-muted/50 border border-border p-4">
+    <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
+      <Icon className="w-4 h-4 text-primary" />
+      {label}
+    </div>
+    <p className="text-2xl font-bold text-foreground tabular-nums">
+      {value}
+      <span className="text-sm font-medium text-muted-foreground ml-1">{unit}</span>
+    </p>
+    <p className="text-xs text-muted-foreground mt-2 leading-snug">{hint}</p>
+  </div>
+);
 
 export const SpeedTest = () => {
   const [phase, setPhase] = useState<Phase>("idle");
