@@ -172,6 +172,26 @@ export const SpeedTest = () => {
       logMeasurementApiUrl: null,
       measureDownloadLoadedLatency: true,
       measureUploadLoadedLatency: true,
+      // Krótsza sekwencja: przy wolnym łączu kierunek kończy się,
+      // gdy pojedyncza próba trwa > 0,5 s, a liczba powtórzeń jest mniejsza.
+      bandwidthFinishRequestDuration: 500,
+      measurements: [
+        { type: "latency", numPackets: 1 },
+        { type: "download", bytes: 1e5, count: 1, bypassMinDuration: true },
+        { type: "latency", numPackets: 20 },
+        { type: "download", bytes: 1e5, count: 5 },
+        { type: "download", bytes: 1e6, count: 4 },
+        { type: "upload", bytes: 1e5, count: 5 },
+        { type: "upload", bytes: 1e6, count: 3 },
+        { type: "packetLoss", numPackets: 1e3, batchSize: 10, batchWaitTime: 10, responsesWaitTime: 3000 },
+        { type: "download", bytes: 1e7, count: 3 },
+        { type: "upload", bytes: 1e7, count: 3 },
+        { type: "download", bytes: 2.5e7, count: 2 },
+        { type: "upload", bytes: 2.5e7, count: 2 },
+        { type: "download", bytes: 1e8, count: 2 },
+        { type: "upload", bytes: 5e7, count: 2 },
+        { type: "download", bytes: 2.5e8, count: 1 },
+      ] as any,
     });
     engineRef.current = engine;
 
