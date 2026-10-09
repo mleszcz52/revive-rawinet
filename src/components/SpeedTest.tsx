@@ -15,7 +15,7 @@ const DOWN = (bytes: number) => `${CF}/__down?bytes=${bytes}`;
 const UP = `${CF}/__up`;
 
 const DOWN_STREAMS = 8;
-const UP_STREAMS = 6;
+const UP_STREAMS = 8;
 const WARMUP_MS = 1200;
 const DOWN_MS = 6000;
 const UP_MS = 6000;
@@ -138,9 +138,9 @@ async function measureDownload(
   return ((total - base) * 8) / span / 1e6;
 }
 
-let uploadPayload: Uint8Array | null = null;
+let uploadPayload: Blob | null = null;
 const getUploadPayload = () => {
-  if (!uploadPayload) uploadPayload = new Uint8Array(UPLOAD_MB * 1024 * 1024);
+  if (!uploadPayload) uploadPayload = new Blob([new Uint8Array(UPLOAD_MB * 1024 * 1024)]);
   return uploadPayload;
 };
 
@@ -174,7 +174,7 @@ function sendOnce(
     xhr.ontimeout = () => settle(false, false);
     xhr.onabort = () => settle(false, false);
     signal.addEventListener("abort", () => xhr.abort(), { once: true });
-    xhr.send(getUploadPayload().subarray(0, size));
+    xhr.send(getUploadPayload().slice(0, size));
   });
 }
 
@@ -196,7 +196,7 @@ async function measureUpload(onLive: (mbps: number) => void): Promise<number> {
     while (performance.now() < deadline && !stop.signal.aborted) {
       const size = clamp(
         Math.round(((rate / UP_STREAMS) * 0.9) / 1000) * 1000,
-        1_000_000,
+        2_000_000,
         UPLOAD_MB * 1024 * 1024
       );
       const ok = await sendOnce(size, stop.signal, (n) => {
