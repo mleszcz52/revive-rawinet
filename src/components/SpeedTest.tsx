@@ -271,9 +271,14 @@ export const SpeedTest = () => {
       <h3 className="text-xl font-semibold text-foreground mb-1 text-center">
         Test prędkości Rawi-Net
       </h3>
-      <p className="text-sm text-muted-foreground text-center mb-6">
+      <p className="text-sm text-muted-foreground text-center mb-2">
         Pomiar trwa kilkanaście sekund i idzie do sieci Cloudflare — mierzy pobieranie, wysyłanie,
         opóźnienie, straty pakietów oraz jakość łącza dla streamingu, gier i wideorozmów.
+      </p>
+      <p className="text-xs text-muted-foreground text-center mb-6 max-w-2xl mx-auto">
+        Strona wykonuje kilkadziesiąt prób w coraz większych porcjach (od 100 kB do 250 MB przy
+        pobieraniu i do 50 MB przy wysyłaniu), a między nimi sprawdza opóźnienie. Jako wynik pokazuje
+        najlepsze powtarzalne wartości, nie średnią — średnią zaniżają chwilowe spadki.
       </p>
 
       <div className="relative">
