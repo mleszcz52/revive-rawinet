@@ -7,6 +7,7 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   Gauge,
+  Info,
   Loader2,
   Network,
   Play,
@@ -14,6 +15,7 @@ import {
   Timer,
   TriangleAlert,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const CAPS = [50, 100, 200, 300, 500, 700, 1000, 1200, 2000];
 
