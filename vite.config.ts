@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => ({
           ],
           three: ["three", "postprocessing"],
           charts: ["recharts"],
+          speedtest: ["@cloudflare/speedtest"],
         },
       },
     },
