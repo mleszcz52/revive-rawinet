@@ -322,66 +322,50 @@ export const SpeedTest = () => {
       {results && (
         <>
           <div className="mt-8 grid grid-cols-2 lg:grid-cols-3 gap-3">
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <ArrowDownToLine className="w-4 h-4 text-primary" />
-                Pobieranie
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {fmt(results.download)}
-                <span className="text-sm font-medium text-muted-foreground ml-1">Mb/s</span>
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <ArrowUpFromLine className="w-4 h-4 text-primary" />
-                Wysyłanie
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.upload > 0 ? fmt(results.upload) : "—"}
-                <span className="text-sm font-medium text-muted-foreground ml-1">Mb/s</span>
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <Timer className="w-4 h-4 text-primary" />
-                Opóźnienie
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.ping > 0 ? results.ping.toFixed(0) : "—"}
-                <span className="text-sm font-medium text-muted-foreground ml-1">ms</span>
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <Activity className="w-4 h-4 text-primary" />
-                Jitter
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.jitter.toFixed(1)}
-                <span className="text-sm font-medium text-muted-foreground ml-1">ms</span>
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <Network className="w-4 h-4 text-primary" />
-                Straty pakietów
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.packetLoss !== null ? results.packetLoss.toFixed(2) : "—"}
-                <span className="text-sm font-medium text-muted-foreground ml-1">%</span>
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 border border-border p-4">
-              <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-                <Gauge className="w-4 h-4 text-primary" />
-                Opóźnienie pod obciążeniem
-              </div>
-              <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.downLoadedLatency !== null ? results.downLoadedLatency.toFixed(0) : "—"}
-                <span className="text-sm font-medium text-muted-foreground ml-1">ms</span>
-              </p>
-            </div>
+            <Metric
+              icon={ArrowDownToLine}
+              label="Pobieranie"
+              value={fmt(results.download)}
+              unit="Mb/s"
+              hint="Ile danych serwis dostarcza do Twojego urządzenia. Im więcej, tym szybciej wczytują się strony, filmy i pliki."
+            />
+            <Metric
+              icon={ArrowUpFromLine}
+              label="Wysyłanie"
+              value={results.upload > 0 ? fmt(results.upload) : "—"}
+              unit="Mb/s"
+              hint="Ile danych wychodzi z Twojego urządzenia. Ważne przy wideorozmowach, wysyłaniu zdjęć i kopii zapasowych."
+            />
+            <Metric
+              icon={Timer}
+              label="Opóźnienie"
+              value={results.ping > 0 ? results.ping.toFixed(0) : "—"}
+              unit="ms"
+              hint="Czas, po jakim sygnał dociera do serwera i wraca. Im mniej, tym sprawniej działają gry i rozmowy. Dobrze: poniżej 50 ms."
+            />
+            <Metric
+              icon={Activity}
+              label="Jitter"
+              value={results.jitter.toFixed(1)}
+              unit="ms"
+              hint="Jak bardzo ten czas się waha z chwili na chwilę. Niski jitter = wideorozmowy bez zrywania. Dobrze: poniżej 20 ms."
+            />
+            <Metric
+              icon={Network}
+              label="Straty pakietów"
+              value={results.packetLoss !== null ? results.packetLoss.toFixed(2) : "—"}
+              unit="%"
+              hint="Ile danych nie dociera i musi lecieć jeszcze raz. Dobrze: 0%. Powyżej 1% filmy i rozmowy potrafią się zacinać."
+            />
+            <Metric
+              icon={Gauge}
+              label="Opóźnienie pod obciążeniem"
+              value={
+                results.downLoadedLatency !== null ? results.downLoadedLatency.toFixed(0) : "—"
+              }
+              unit="ms"
+              hint="Jak bardzo rośnie opóźnienie, gdy łącze jest w pełni zajęte, np. coś dużego się pobiera. Dobrze: poniżej 100 ms."
+            />
           </div>
 
           <div className="mt-4 flex flex-wrap justify-center gap-2">
