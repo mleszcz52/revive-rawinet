@@ -280,7 +280,7 @@ export const SpeedTest = () => {
               <Info className="h-4 w-4" />
             </button>
           </PopoverTrigger>
-          <PopoverContent align="center" className="w-[22rem] max-w-[85vw] text-sm leading-relaxed">
+          <PopoverContent side="right" align="start" className="w-[22rem] max-w-[85vw] text-sm leading-relaxed">
             <p className="font-medium text-foreground mb-2">Jak działa ten pomiar?</p>
             <p className="text-muted-foreground mb-3">
               Pomiar trwa kilkanaście sekund i idzie do sieci Cloudflare — mierzy pobieranie,
