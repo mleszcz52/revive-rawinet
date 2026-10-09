@@ -360,7 +360,7 @@ export const SpeedTest = () => {
               label="Straty pakietów"
               value={results.packetLoss !== null ? results.packetLoss.toFixed(2) : "—"}
               unit="%"
-              hint="Ile danych nie dociera i musi lecieć jeszcze raz. Dobrze: 0%. Powyżej 1% filmy i rozmowy potrafią się zacinać."
+              hint="Ile danych nie dociera i musi lecieć jeszcze raz. Dobrze: 0%; powyżej 1% rozmowy potrafią się zacinać. Kreska oznacza, że ten punkt nie został zmierzony."
             />
             <Metric
               icon={Gauge}
