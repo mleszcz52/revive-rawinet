@@ -148,6 +148,7 @@ export const SpeedTest = () => {
     engine.onPhaseChange = ({ measurement }) => {
       if (!alive.current) return;
       const next = phaseOf(measurement.type as MeasurementType);
+      phaseRef.current = next;
       setPhase(next);
       if (next === "download" || next === "upload") maxRef.current = 50;
     };
@@ -155,10 +156,14 @@ export const SpeedTest = () => {
     engine.onResultsChange = () => {
       if (!alive.current) return;
       const s = engine.results.getSummary();
-      const cur = phaseOf(engine.results.raw ? (engineRef.current?.isRunning ? "ping" : "ping") : "ping");
-      void cur;
-      if (s.download !== undefined) {
+      if (phaseRef.current === "ping") {
+        setLive(s.latency ?? 0);
+      } else if (phaseRef.current === "download" && s.download !== undefined) {
         const mbps = s.download / 1e6;
+        bumpMax(mbps);
+        setLive(mbps);
+      } else if (phaseRef.current === "upload" && s.upload !== undefined) {
+        const mbps = s.upload / 1e6;
         bumpMax(mbps);
         setLive(mbps);
       }
