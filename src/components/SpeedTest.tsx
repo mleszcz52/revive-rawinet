@@ -255,15 +255,11 @@ export const SpeedTest = () => {
   const unit =
     phase === "upload" && busy ? "Mb/s wysyłania" : phase === "ping" && busy ? "ms" : "Mb/s pobierania";
 
-  const verdict = useMemo(() => {
-    if (!results || phase !== "done") return null;
-    const d = results.download;
-    if (d >= 850)
-      return "Wynik odpowiada łączu gigabitowemu na kablu. Jeśli masz pakiet 1 Gb/s, wszystko jest w porządku.";
-    if (d >= 600) return "Bardzo dobry wynik — odpowiada pakietom 700 Mb/s i wyższym.";
-    if (d >= 250) return "Dobry wynik — odpowiada pakietom 300 Mb/s i wyższym.";
-    if (d >= 80) return "Wynik poprawny dla mniejszych pakietów. Przy kablu sprawdź, czy karta sieciowa nie pracuje w trybie 100 Mb/s.";
-    return "Wynik jest niski. Powtórz test na kablu Ethernet i przy zamkniętych aplikacjach korzystających z internetu.";
+  // Nie oceniamy wyniku przez pryzmat pakietu — klient z 1 Gb/s nie powinien
+  // czytać "dobry wynik jak na 300". Ostrzegamy tylko, gdy wynik jest wyraźnie niski.
+  const lowResult = useMemo(() => {
+    if (!results || phase !== "done") return false;
+    return results.download < 80;
   }, [results, phase]);
 
   return (
@@ -407,9 +403,10 @@ export const SpeedTest = () => {
         </p>
       )}
 
-      {verdict && (
+      {lowResult && (
         <p className="mt-4 text-sm text-muted-foreground text-center max-w-xl mx-auto">
-          {verdict}
+          Wynik jest niski. Powtórz test na kablu Ethernet i przy zamkniętych aplikacjach
+          korzystających z internetu.
         </p>
       )}
 
