@@ -1,4 +1,6 @@
 import { Gauge, Wifi, Cable, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { SpeedTest } from "@/components/SpeedTest";
+
 import {
   Table,
   TableBody,
