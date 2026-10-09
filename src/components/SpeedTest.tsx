@@ -321,7 +321,7 @@ export const SpeedTest = () => {
                 Opóźnienie
               </div>
               <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.ping.toFixed(0)}
+                {results.ping > 0 ? results.ping.toFixed(0) : "—"}
                 <span className="text-sm font-medium text-muted-foreground ml-1">ms</span>
               </p>
             </div>
