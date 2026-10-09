@@ -174,11 +174,13 @@ export const SpeedTest = () => {
       if (!alive.current) return;
       const s = res.getSummary();
       const scores = res.getScores();
+      // Pokazujemy tylko oceny, które silnik rzeczywiście zmierzył —
+      // brak pomiaru (np. niedostępny test strat pakietów) to nie „zła jakość".
       const entries: ScoreEntry[] = [
-        { label: "Streaming wideo", name: scores.streaming?.classificationName ?? "bad" },
-        { label: "Gry online", name: scores.gaming?.classificationName ?? "bad" },
-        { label: "Wideorozmowy", name: scores.rtc?.classificationName ?? "bad" },
-      ];
+        { label: "Streaming wideo", name: scores.streaming?.classificationName ?? "" },
+        { label: "Gry online", name: scores.gaming?.classificationName ?? "" },
+        { label: "Wideorozmowy", name: scores.rtc?.classificationName ?? "" },
+      ].filter((e) => e.name.length > 0);
       setResults({
         download: (s.download ?? 0) / 1e6,
         upload: (s.upload ?? 0) / 1e6,
@@ -319,7 +321,7 @@ export const SpeedTest = () => {
                 Opóźnienie
               </div>
               <p className="text-2xl font-bold text-foreground tabular-nums">
-                {results.ping.toFixed(0)}
+                {results.ping > 0 ? results.ping.toFixed(0) : "—"}
                 <span className="text-sm font-medium text-muted-foreground ml-1">ms</span>
               </p>
             </div>
